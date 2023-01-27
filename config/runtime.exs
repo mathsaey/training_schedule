@@ -30,7 +30,7 @@ if config_env() == :prod do
       For example: training.example.com
       """
 
-  ip = :inet.parse_address(String.to_charlist(System.get_env("TS_IP") || "0.0.0.0"))
+  {:ok, ip} = :inet.parse_address(String.to_charlist(System.get_env("TS_IP") || "0.0.0.0"))
   port = String.to_integer(System.get_env("TS_PORT") || "4000")
 
   config :training_schedule, TrainingSchedule.Repo, database: database_path
