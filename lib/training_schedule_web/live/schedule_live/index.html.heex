@@ -1,0 +1,80 @@
+<div class="flex w-full justify-center">
+  <div class="flex">
+    <.nav_link patch={~p"/from/#{@back}/to/#{@to}"}>
+      <Heroicons.chevron_up outline class="h-5" />
+    </.nav_link>
+    <.nav_link patch={~p"/"}>
+      Reset
+    </.nav_link>
+    <.nav_link patch={~p"/from/#{@from}/to/#{@forward}"}>
+      <Heroicons.chevron_down outline class="h-5" />
+    </.nav_link>
+  </div>
+</div>
+
+<div class="hidden w-full grid-cols-7 xl:grid">
+  <div
+    :for={day <- ~w(Mon Tue Wed Thu Fri Sat Sun)}
+    class={["flex justify-center py-2", cell_border()]}
+  >
+    <%= day %>
+  </div>
+</div>
+<div
+  id="workout_schedule"
+  class="grid w-full grid-cols-1 xl:grid-cols-7"
+  phx-hook="WorkoutDragAndDrop"
+>
+  <div :for={_ <- @empty_before} class={["hidden xl:flex", cell_border()]} />
+  <div
+    :for={date <- @dates}
+    id={"cell_#{date}"}
+    class={["flex flex-col items-center", cell_border()]}
+    dropable="true"
+  >
+    <div class="flex w-full justify-between p-2">
+      <.link patch={~p"/from/#{@from}/to/#{@to}/new/#{date}"} replace>
+        <Heroicons.plus_circle
+          mini
+          class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
+        />
+      </.link>
+      <p class="font-thin text-gray-600 dark:text-gray-400">
+        <%= case date.day do %>
+          <% 1 -> %>
+            <span class="font-normal"><%= Calendar.strftime(date, "%b") %></span>&nbsp 1
+          <% day -> %>
+            <%= day %>
+        <% end %>
+      </p>
+    </div>
+    <.workout_card
+      :for={workout <- Map.get(@workouts, date, [])}
+      id={"workout_#{workout.id}"}
+      type={workout.type}
+      action={~p"/from/#{@from}/to/#{@to}/edit/#{date}/#{workout.id}"}
+      draggable="true"
+    >
+      <%= workout.description %>
+      <:distance>
+        <%= workout.distance %>
+      </:distance>
+    </.workout_card>
+  </div>
+  <div :for={_ <- @empty_after} class={["hidden xl:flex", cell_border()]} />
+</div>
+
+<%= case @live_action do %>
+  <% :index -> %>
+  <% form when form in [:new, :edit] -> %>
+    <.live_component
+      id={@form_id}
+      action={@live_action}
+      module={FormComponent}
+      user={@user}
+      types={@workout_types}
+      date={@date}
+      from={@from}
+      to={@to}
+    />
+<% end %>

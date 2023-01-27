@@ -1,0 +1,50 @@
+<div>
+  <.workout_form_modal id="schedule_workout_popup" return={~p"/from/#{@from}/to/#{@to}"}>
+    <:preview>
+      <div class="flex flex-col items-center">
+        <.workout_card type={@type}>
+          <:distance><%= @preview.distance %></:distance>
+          <%= @preview.description %>
+        </.workout_card>
+        <%= Calendar.strftime(@date, "%A, %B %d") %>
+      </div>
+    </:preview>
+    <:preview_action>
+      <.link
+        :if={@action == :edit}
+        phx-click="delete"
+        phx-target={@myself}
+        class="mb-2 text-red-500"
+      >
+        Delete
+      </.link>
+    </:preview_action>
+    <.form
+      :let={f}
+      for={@changeset}
+      id="workout_form"
+      phx-submit="save"
+      phx-change="change"
+      phx-target={@myself}
+      class="flex flex-col justify-between"
+    >
+      <div class="overflow-auto">
+        <.input
+          field={{f, :type_id}}
+          type="select"
+          label="Workout Type"
+          prompt=""
+          options={@workout_types}
+        />
+        <.input field={{f, :distance}} type="number" min="0" label="Distance" />
+        <.input field={{f, :date}} value={@date} type="hidden" />
+
+        <.description_field_inputs form={f} type={@type} />
+      </div>
+
+      <div class="flex items-center justify-center">
+        <.button type="submit">Save</.button>
+      </div>
+    </.form>
+  </.workout_form_modal>
+</div>

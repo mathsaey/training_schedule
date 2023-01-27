@@ -1,0 +1,38 @@
+<div>
+  <.workout_form_modal id="workout_type_form_popup" return={~p"/workouts"}>
+    <:preview>
+      <.workout_card type={@preview}>
+        <%= @preview.template %>
+      </.workout_card>
+    </:preview>
+    <:preview_action>
+      <.link
+        :if={@action == :edit}
+        phx-click="delete"
+        phx-target={@myself}
+        class="mb-2 text-red-500"
+      >
+        Delete
+      </.link>
+    </:preview_action>
+    <.form
+      :let={f}
+      for={@changeset}
+      id="type_form"
+      phx-submit="save"
+      phx-change="change"
+      phx-target={@myself}
+      class="flex flex-col justify-between"
+    >
+      <div class="overflow-auto">
+        <.input field={{f, :name}} type="text" label="Name" />
+        <.input field={{f, :color}} class="w-full" type="color" label="Colour" />
+        <.input field={{f, :template}} type="text" label="Content template" />
+      </div>
+
+      <div class="flex items-center justify-center">
+        <.button type="submit">Save</.button>
+      </div>
+    </.form>
+  </.workout_form_modal>
+</div>

@@ -1,0 +1,6 @@
+<div class="my-4 flex flex-col items-center space-y-2 text-lg">
+  <.flash kind={:info} flash={@flash} id="flash_info" />
+  <.flash kind={:error} flash={@flash} id="flash_err" />
+</div>
+
+<%= @inner_content %>

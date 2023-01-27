@@ -1,0 +1,25 @@
+<.header>Workout Types</.header>
+
+<div class="mb-20 flex flex-col items-center gap-10 sm:flex-row sm:flex-wrap sm:content-start">
+  <.workout_card :for={type <- @workout_types} type={type} action={~p"/workouts/edit/#{type}"}>
+    <%= type.template %>
+  </.workout_card>
+</div>
+
+<div class="flex">
+  <.link_button patch={~p"/workouts/new/"} replace>
+    New Workout Type
+  </.link_button>
+</div>
+
+<%= case @live_action do %>
+  <% :index -> %>
+  <% form when form in [:new, :edit] -> %>
+    <.live_component
+      module={FormComponent}
+      id={@form_id}
+      user={@user}
+      action={@live_action}
+      return={~p"/workouts"}
+    />
+<% end %>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <title><%= assigns[:page_title] || "TrainingSchedule.ex" %></title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+  <body class="flex min-h-screen flex-col bg-gray-100 dark:bg-gray-700">
+    <header>
+      <nav class="mb-2 flex w-full items-baseline justify-center bg-cyan-800 text-slate-100 sm:justify-between">
+        <.link class="p-4 text-xl font-medium" navigate={~p"/"}>
+          TrainingSchedule<span class="font-thin text-slate-400">.ex</span>
+        </.link>
+        <ul class="hidden items-baseline justify-end sm:flex">
+          <li :for={
+            {link, route} <-
+              if AuthController.logged_in_token?(@conn),
+                do: logged_in_links(),
+                else: logged_out_links()
+          }>
+            <.link class="p-4" navigate={route} replace><%= link %></.link>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="mb-auto flex items-baseline justify-center text-gray-800 dark:text-gray-200">
+      <div class="w-full lg:w-11/12">
+        <%= @inner_content %>
+      </div>
+    </main>
+    <footer class="mt-10 flex items-baseline justify-between border-t border-gray-200 font-light text-gray-600 dark:border-gray-600 dark:text-gray-400">
+      <p class="py-2 pl-4 font-thin">
+        TrainingSchedule<span class="font-thin">.ex</span> <%= version() %>
+      </p>
+      <ul class="flex divide-x divide-gray-200 dark:divide-gray-600">
+        <li :for={{name, route} <- footer_links()}>
+          <.link
+            class="px-4 py-2 text-blue-900 hover:underline dark:text-blue-400"
+            target="_blank"
+            href={route}
+          >
+            <%= name %>
+          </.link>
+        </li>
+      </ul>
+    </footer>
+  </body>
+</html>

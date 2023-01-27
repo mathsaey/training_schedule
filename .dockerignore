@@ -1,0 +1,14 @@
+.dockerignore
+.gitignore
+.elixir_ls
+.git
+
+/_build/
+/cover/
+/deps/
+/doc/
+
+/test/
+/data/
+
+erl_crash.dump
