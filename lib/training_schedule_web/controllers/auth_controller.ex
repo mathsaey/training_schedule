@@ -1,6 +1,7 @@
 defmodule TrainingScheduleWeb.AuthController do
   use TrainingScheduleWeb, :controller
   import Phoenix.Component, only: [assign_new: 3]
+  require Logger
 
   alias Phoenix.LiveView.Socket
   alias TrainingSchedule.Accounts
@@ -22,6 +23,8 @@ defmodule TrainingScheduleWeb.AuthController do
   def authenticate(conn, %{"login" => %{"username" => u, "password" => p, "navigate" => n}}) do
     case Accounts.authenticate(u, p) do
       {:ok, token} ->
+        Logger.info("New session for user #{u}")
+
         conn
         |> configure_session(renew: true)
         |> clear_session()
@@ -30,6 +33,8 @@ defmodule TrainingScheduleWeb.AuthController do
         |> redirect(to: if(n == "", do: home_path(), else: n))
 
       :error ->
+        Logger.info("Failed login attempt for user #{u}")
+
         conn
         |> put_flash(:error, "Invalid username or password")
         |> render("login.html", navigate: n)
