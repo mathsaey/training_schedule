@@ -1,0 +1,20 @@
+version: '3'
+services:
+  app:
+    container_name: training_schedule
+    build: ./training_schedule
+    image: training_schedule
+    ports:
+      - "9999:4000"
+    environment:
+      # Modify this to point to your domain
+      - TS_HOST=training.example.com
+      # Create a (suitably protected) .env file which contains
+      # TS_SECRET_BASE_KEY=<your secret key here>
+      # You can generate a suitable key with:
+      # $ openssl rand -base64 48
+      - TS_SECRET_BASE_KEY=${TS_SECRET_BASE_KEY}
+    volumes:
+      # Ensure the nobody user of the container has
+      # write access to this directory.
+      - ./data:/data
