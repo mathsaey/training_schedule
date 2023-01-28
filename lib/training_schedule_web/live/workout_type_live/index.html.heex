@@ -1,7 +1,7 @@
 <.header>Workout Types</.header>
 
 <div class="mb-20 flex flex-col items-center gap-10 sm:flex-row sm:flex-wrap sm:content-start">
-  <.workout_card :for={type <- @workout_types} type={type} action={~p"/workouts/edit/#{type}"}>
+  <.workout_card :for={type <- @workout_types} type={type} action={~p"/workouts/edit/#{type}"} replace>
     <%= type.template %>
   </.workout_card>
 </div>

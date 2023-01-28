@@ -16,7 +16,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
   attr :id, :string, default: nil
   attr :action, :string, default: nil
   attr :type, TrainingSchedule.Workouts.Type, required: true
-  attr :rest, :global, include: ~w(draggable)
+  attr :rest, :global, include: ~w(draggable replace)
   slot :inner_block, required: true
   slot :distance, required: false
 
@@ -32,7 +32,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def workout_card(assigns) do
     ~H"""
-    <.link id={@id} replace patch={@action} {@rest}>
+    <.link id={@id} patch={@action} {@rest}>
       <div class={[workout_card_shared(), "hover:ring-4"]} style={"background-color:#{@type.color}"}>
         <p class="break-words font-bold"><%= @type.name %></p>
         <p class="break-words font-light"><%= render_slot(@inner_block) %></p>

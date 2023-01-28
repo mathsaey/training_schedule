@@ -88,7 +88,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   defp redirect_to_default_url(socket) do
     from = Date.utc_today() |> Date.beginning_of_week()
     to = Date.add(from, @schedule_days)
-    push_patch(socket, to: ~p"/from/#{from}/to/#{to}")
+    push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
   end
 
   defp maybe_load_between(socket, from, to) do

@@ -55,8 +55,9 @@
       :for={workout <- Map.get(@workouts, date, [])}
       id={"workout_#{workout.id}"}
       type={workout.type}
-      action={~p"/from/#{@from}/to/#{@to}/edit/#{date}/#{workout.id}"}
       draggable="true"
+      action={~p"/from/#{@from}/to/#{@to}/edit/#{date}/#{workout.id}"}
+      replace
     >
       <%= workout.description %>
       <:distance>

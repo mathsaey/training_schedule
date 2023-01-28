@@ -22,7 +22,7 @@
                 do: logged_in_links(),
                 else: logged_out_links()
           }>
-            <.link class="p-4" navigate={route} replace><%= link %></.link>
+            <.link class="p-4" navigate={route} replace={false}><%= link %></.link>
           </li>
         </ul>
       </nav>

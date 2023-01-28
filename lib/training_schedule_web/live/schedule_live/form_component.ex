@@ -62,7 +62,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
 
   def after_update(socket) do
     PubSub.broadcast(TSPS, "workouts:#{socket.assigns.user.id}", :workouts_changed)
-    {:noreply, push_patch(socket, to: ~p"/from/#{socket.assigns.from}/to/#{socket.assigns.to}")}
+    {:noreply, push_patch(socket, to: ~p"/from/#{socket.assigns.from}/to/#{socket.assigns.to}", replace: true)}
   end
 
   def workout(:new, assigns) do
