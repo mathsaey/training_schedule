@@ -19,6 +19,8 @@ defmodule TrainingSchedule.Workouts.Template do
 
   defparsecp(:_parse, repeat(choice([wrapped_content, other_content])) |> eos(), inline: true)
 
+  def parse(nil), do: {:ok, []}
+
   def parse(template) do
     case _parse(template) do
       {:ok, parsed, "", _, _, _} ->
