@@ -9,12 +9,6 @@ workout types which can be planned on a calendar.
 This project is very much in its infancy. While the groundwork is present for
 some upcoming features, limited time means they may not land any time soon.
 
-It was also a nice excuse for me to learn css fundamentals by playing
-with [tailwind](https://tailwindcss.com/), and to get used to developing web
-applications with [Phoenix](https://www.phoenixframework.org/) and Phoenix
-LiveView. Since it is my first time working with both of these technologies,
-you should not expect to see idiomatic Tailwind or LiveView code here.
-
 ## Features
 
 - Create custom workout types
@@ -26,6 +20,7 @@ Under development:
 
 ### Ideas for future versions
 
+- ical export
 - Share (parts of) your schedule publicly
 - Integrate with strava, garmin connect, … to compare expected / actual mileage.
 - Workout description / notes with markdown support
@@ -130,6 +125,13 @@ production.
 | `TS_HOST` | `"training.example.com"` | | The url at which the site will be served. |
 | `TS_IP` | `"127.0.0.1"` | `"0.0.0.0"` | The ip to which the webserver will bind. |
 | `TS_PORT` | `"4000"` | `"4000"` | The port to which the webserver will listen. |
+
+## Software Stack
+
+This project was built on top of [tailwind](https://tailwindcss.com/) and
+[Phoenix LiveView](https://www.phoenixframework.org/). While I am experienced
+in writing Elixir, I have little to no experience writing CSS or LiveView code.
+Thus, do not expect idiomatic Tailwind or LiveView code here.
 
 # Contributing
 
