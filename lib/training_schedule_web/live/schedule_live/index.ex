@@ -25,7 +25,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
       |> Workouts.list_user_types()
       |> Enum.map(&Workouts.derive_type_template_fields/1)
 
-    {:ok, assign(socket, :workout_types, workout_types)}
+    {:ok, assign(socket, page_title: "Training Schedule", workout_types: workout_types)}
   end
 
   @impl true
