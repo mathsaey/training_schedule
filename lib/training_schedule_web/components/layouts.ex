@@ -2,7 +2,7 @@ defmodule TrainingScheduleWeb.Layouts do
   use TrainingScheduleWeb, :html
   alias TrainingScheduleWeb.AuthController
 
-  @version Application.spec(:training_schedule, :vsn) |> to_string()
+  @version Mix.Project.config()[:version]
 
   defp logged_in_links do
     [
