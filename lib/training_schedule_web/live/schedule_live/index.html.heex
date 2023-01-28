@@ -33,13 +33,16 @@
     dropable="true"
   >
     <div class="flex w-full justify-between p-2">
-      <.link patch={~p"/from/#{@from}/to/#{@to}/new/#{date}"} replace>
+      <.link patch={~p"/from/#{@from}/to/#{@to}/new/#{date}"} replace class="w-14">
         <Heroicons.plus_circle
           mini
           class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
         />
       </.link>
-      <p class="font-thin text-gray-600 dark:text-gray-400">
+      <p class="xl:hidden font-thin text-gray-600 dark:text-gray-400">
+        <%= Calendar.strftime(date, "%a") %>
+      </p>
+      <p class="w-14 text-right font-thin text-gray-600 dark:text-gray-400">
         <%= case date.day do %>
           <% 1 -> %>
             <span class="font-normal"><%= Calendar.strftime(date, "%b") %></span>&nbsp 1
