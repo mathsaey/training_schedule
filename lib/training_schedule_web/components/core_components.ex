@@ -13,6 +13,18 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   alias Phoenix.LiveView.JS
 
+  attr :unit, :string, default: "km"
+  attr :distance, :float, required: true
+
+  def distance(assigns) do
+    ~H"""
+    <%= format_distance(@distance) %> <%= @unit %>
+    """
+  end
+
+  defp format_distance(distance) when round(distance) == distance, do: round(distance)
+  defp format_distance(distance), do: distance
+
   attr :id, :string, default: nil
   attr :action, :string, default: nil
   attr :distance, :float, default: nil
@@ -26,7 +38,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
       <p class={workout_card_title()}><%= @type.name %></p>
       <p class={workout_card_content()}><%= render_slot(@inner_block) %></p>
       <p :if={@distance} class={workout_card_distance()}>
-        <%= format_distance(@distance) %> km
+        <.distance distance={@distance}/>
       </p>
     </div>
     """
@@ -39,15 +51,12 @@ defmodule TrainingScheduleWeb.CoreComponents do
         <p class="break-words font-bold"><%= @type.name %></p>
         <p class="break-words font-light"><%= render_slot(@inner_block) %></p>
         <p :if={@distance} class={workout_card_distance()}>
-          <%= format_distance(@distance) %> km
+          <.distance distance={@distance}/>
         </p>
       </div>
     </.link>
     """
   end
-
-  defp format_distance(distance) when round(distance) == distance, do: round(distance)
-  defp format_distance(distance), do: distance
 
   defp workout_card_shared, do: "space-y-1p flex w-48 flex-col rounded p-4 m-2 text-center"
   defp workout_card_title, do: "break-words font-bold"
