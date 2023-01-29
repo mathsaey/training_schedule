@@ -56,13 +56,11 @@
       id={"workout_#{workout.id}"}
       type={workout.type}
       draggable="true"
+      distance={workout.distance}
       action={~p"/from/#{@from}/to/#{@to}/edit/#{date}/#{workout.id}"}
       replace
     >
       <%= workout.description %>
-      <:distance>
-        <%= workout.distance %>
-      </:distance>
     </.workout_card>
   </div>
   <div :for={_ <- @empty_after} class={["hidden xl:flex", cell_border()]} />

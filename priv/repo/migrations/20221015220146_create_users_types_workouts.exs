@@ -32,7 +32,7 @@ defmodule TrainingSchedule.Repo.Migrations.CreateUsersTypesWorkouts do
       add :type_id, references("types", on_delete: :delete_all)
 
       add :date, :date, null: false
-      add :distance, :integer, null: false
+      add :distance, :float, null: false
       add :description_fields, :map, null: false
     end
 

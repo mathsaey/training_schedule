@@ -2,8 +2,7 @@
   <.workout_form_modal id="schedule_workout_popup" return={~p"/from/#{@from}/to/#{@to}"}>
     <:preview>
       <div class="flex flex-col items-center">
-        <.workout_card type={@type}>
-          <:distance><%= @preview.distance %></:distance>
+        <.workout_card type={@type} distance={@preview.distance}>
           <%= @preview.description %>
         </.workout_card>
         <%= Calendar.strftime(@date, "%A, %B %d") %>
@@ -36,7 +35,7 @@
           prompt=""
           options={@workout_types}
         />
-        <.input field={{f, :distance}} type="number" min="0" label="Distance" />
+        <.input field={{f, :distance}} type="number" step="any" min="0" label="Distance" />
         <.input field={{f, :date}} value={@date} type="hidden" />
 
         <.description_field_inputs form={f} type={@type} />

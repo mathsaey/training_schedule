@@ -15,17 +15,19 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   attr :id, :string, default: nil
   attr :action, :string, default: nil
+  attr :distance, :float, default: nil
   attr :type, TrainingSchedule.Workouts.Type, required: true
   attr :rest, :global, include: ~w(draggable replace)
   slot :inner_block, required: true
-  slot :distance, required: false
 
   def workout_card(%{action: nil} = assigns) do
     ~H"""
     <div class={workout_card_shared()} id={@id} style={"background-color:#{@type.color}"} {@rest}>
       <p class={workout_card_title()}><%= @type.name %></p>
       <p class={workout_card_content()}><%= render_slot(@inner_block) %></p>
-      <p :if={@distance != []} class={workout_card_distance()}><%= render_slot(@distance) %> km</p>
+      <p :if={@distance} class={workout_card_distance()}>
+        <%= format_distance(@distance) %> km
+      </p>
     </div>
     """
   end
@@ -36,11 +38,16 @@ defmodule TrainingScheduleWeb.CoreComponents do
       <div class={[workout_card_shared(), "hover:ring-4"]} style={"background-color:#{@type.color}"}>
         <p class="break-words font-bold"><%= @type.name %></p>
         <p class="break-words font-light"><%= render_slot(@inner_block) %></p>
-        <p :if={@distance != []}><%= render_slot(@distance) %> km</p>
+        <p :if={@distance} class={workout_card_distance()}>
+          <%= format_distance(@distance) %> km
+        </p>
       </div>
     </.link>
     """
   end
+
+  defp format_distance(distance) when round(distance) == distance, do: round(distance)
+  defp format_distance(distance), do: distance
 
   defp workout_card_shared, do: "space-y-1p flex w-48 flex-col rounded p-4 m-2 text-center"
   defp workout_card_title, do: "break-words font-bold"

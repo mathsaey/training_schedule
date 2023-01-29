@@ -5,7 +5,7 @@ defmodule TrainingSchedule.Workouts.Workout do
 
   schema "workouts" do
     field :date, :date
-    field :distance, :integer
+    field :distance, :float
     field :description_fields, {:map, :string}
     field :description, :string, virtual: true
 
