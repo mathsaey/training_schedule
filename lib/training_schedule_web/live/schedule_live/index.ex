@@ -115,10 +115,26 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
       socket.assigns.user.id
       |> Workouts.list_user_workouts(socket.assigns.from, socket.assigns.to)
       |> Enum.map(&Workouts.derive_description/1)
-      |> Enum.group_by(& &1.date)
 
-    assign(socket, :workouts, workouts)
+    socket
+    |> assign(:workouts, workouts)
+    |> group_content()
   end
+
+  defp group_content(socket) do
+    dates = Enum.chunk_by(socket.assigns.dates, &Date.beginning_of_week/1)
+    workouts = Enum.group_by(socket.assigns.workouts, & &1.date)
+
+    content =
+      dates
+      |> Enum.map(fn lst -> Enum.map(lst, &{&1, Map.get(workouts, &1, [])}) end)
+      |> Enum.map(fn lst ->
+        {lst |> Enum.flat_map(&elem(&1, 1)) |> Enum.map(& &1.distance) |> Enum.sum(), lst}
+      end)
+
+    assign(socket, :content, content)
+  end
+
 
   defp noninclusive_date_range(from, to) when from == to, do: []
   defp noninclusive_date_range(from, to), do: Date.range(from, Date.add(to, -1))

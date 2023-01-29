@@ -16,7 +16,8 @@ module.exports = {
       'mono': ['Menlo', 'ui-monospace']
     },
     extend: {
-      colors: {
+      gridTemplateColumns: {
+        'schedule': '90px repeat(7, minmax(0, 1fr))'
       }
     },
   },

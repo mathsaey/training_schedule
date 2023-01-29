@@ -18,7 +18,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def distance(assigns) do
     ~H"""
-    <%= format_distance(@distance) %> <%= @unit %>
+    <p class="break-words font-light"><%= format_distance(@distance) %> <%= @unit %></p>
     """
   end
 
@@ -37,9 +37,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
     <div class={workout_card_shared()} id={@id} style={"background-color:#{@type.color}"} {@rest}>
       <p class={workout_card_title()}><%= @type.name %></p>
       <p class={workout_card_content()}><%= render_slot(@inner_block) %></p>
-      <p :if={@distance} class={workout_card_distance()}>
-        <.distance distance={@distance}/>
-      </p>
+      <p :if={@distance}><.distance distance={@distance}/></p>
     </div>
     """
   end
@@ -50,9 +48,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
       <div class={[workout_card_shared(), "hover:ring-4"]} style={"background-color:#{@type.color}"}>
         <p class="break-words font-bold"><%= @type.name %></p>
         <p class="break-words font-light"><%= render_slot(@inner_block) %></p>
-        <p :if={@distance} class={workout_card_distance()}>
-          <.distance distance={@distance}/>
-        </p>
+        <p :if={@distance}><.distance distance={@distance}/></p>
       </div>
     </.link>
     """
@@ -61,7 +57,6 @@ defmodule TrainingScheduleWeb.CoreComponents do
   defp workout_card_shared, do: "space-y-1p flex w-48 flex-col rounded p-4 m-2 text-center"
   defp workout_card_title, do: "break-words font-bold"
   defp workout_card_content, do: "break-words font-light"
-  defp workout_card_distance, do: "break-words font-light"
 
   attr :id, :string, required: true
   attr :return, :string, required: true
