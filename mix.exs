@@ -36,12 +36,12 @@ defmodule TrainingSchedule.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_ecto, "~> 4.4"},
-      {:phoenix_live_view, "~> 0.18.3"},
+      {:phoenix_live_view, "~> 0.18"},
 
       # Frontend
       {:heroicons, "~> 0.5"},
-      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.6", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
 
       # Database
       {:ecto_sql, "~> 3.6"},
