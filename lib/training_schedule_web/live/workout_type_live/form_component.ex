@@ -65,5 +65,5 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
     }
   end
 
-  defp type(name, _), do: Workouts.get_type_by_name(name)
+  defp type(name, user), do: Workouts.get_type_by_name(user.id, name)
 end

@@ -12,7 +12,11 @@ defmodule TrainingSchedule.Workouts do
   end
 
   def get_type(id), do: Repo.one(from t in Type, where: t.id == ^id)
-  def get_type_by_name(name), do: Repo.one(from t in Type, where: t.name == ^name)
+
+  def get_type_by_name(user_id, name) do
+    Repo.one(from t in Type, where: t.name == ^name and t.user_id == ^user_id)
+  end
+
   def type_changeset(type, attrs \\ %{}), do: Type.changeset(type, attrs)
 
   def create_type!(type \\ %Type{}, attrs), do: type |> Type.changeset(attrs) |> Repo.insert!()

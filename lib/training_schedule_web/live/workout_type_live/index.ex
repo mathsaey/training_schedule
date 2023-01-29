@@ -36,6 +36,6 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.Index do
     socket
     |> assign(:page_title, "Workouts: #{name}")
     |> assign(:form_id, name)
-    |> assign(:type, Workouts.get_type_by_name(name))
+    |> assign(:type, Workouts.get_type_by_name(socket.assigns.user.id, name))
   end
 end
