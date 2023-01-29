@@ -9,10 +9,14 @@ workout types which can be planned on a calendar.
 This project is very much in its infancy. While the groundwork is present for
 some upcoming features, limited time means they may not land any time soon.
 
+![Screenshot of the training planner](screenshot.png)
+
 ## Features
 
 - Create custom workout types
 - Plan workouts and display them on a calendar
+  - Show weekly mileage
+  - Mobile-friendly view on smaller screens
 
 Under development:
 
@@ -30,10 +34,6 @@ Under development:
 - Support for displaying additional information (e.g. focus of the current training block)
 
 ## Getting Started
-
-If you are not using Docker, you will need to install
-[Elixir](https://elixir-lang.org/). Please refer to the
-[official installation instructions](https://elixir-lang.org/install.html).
 
 ### Using docker-compose
 
