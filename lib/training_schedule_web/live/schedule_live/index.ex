@@ -105,6 +105,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     |> assign(:back, Date.add(from, -7))
     |> assign(:forward, Date.add(to, 7))
     |> assign(:dates, Date.range(from, to))
+    # TODO: these fuck up the weekly mileage
     |> assign(:empty_after, noninclusive_date_range(to, Date.end_of_week(to)))
     |> assign(:empty_before, noninclusive_date_range(Date.beginning_of_week(from), from))
     |> load_workouts()
@@ -128,13 +129,35 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     content =
       dates
       |> Enum.map(fn lst -> Enum.map(lst, &{&1, Map.get(workouts, &1, [])}) end)
-      |> Enum.map(fn lst ->
-        {lst |> Enum.flat_map(&elem(&1, 1)) |> Enum.map(& &1.distance) |> Enum.sum(), lst}
-      end)
+      |> add_statistics()
 
     assign(socket, :content, content)
   end
 
+  defp add_statistics(weeks) do
+    weeks
+    |> Enum.map(&%{days: &1})
+    |> Enum.map(&Map.merge(&1, weekly_stats(&1.days)))
+    |> Enum.map_reduce(nil, fn
+      week, nil -> {week, week}
+      week, prev -> {Map.put(week, :compare_prev, compare_prev(week, prev)), week}
+    end)
+    |> elem(0)
+  end
+
+  defp weekly_stats(week) do
+    total = week |> Enum.flat_map(&elem(&1, 1)) |> Enum.map(& &1.distance) |> Enum.sum()
+    %{total_distance: total}
+  end
+
+  defp compare_prev(%{total_distance: t}, %{total_distance: 0}), do: %{total_distance_diff: t}
+
+  defp compare_prev(%{total_distance: week}, %{total_distance: prev}) do
+    %{
+      total_distance_diff: round(week - prev),
+      total_distance_diff_pct: round(100 * ((week - prev) / prev))
+    }
+  end
 
   defp noninclusive_date_range(from, to) when from == to, do: []
   defp noninclusive_date_range(from, to), do: Date.range(from, Date.add(to, -1))

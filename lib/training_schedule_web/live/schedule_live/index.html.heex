@@ -27,12 +27,22 @@
   phx-hook="WorkoutDragAndDrop"
 >
   <div :for={_ <- @empty_before} />
-  <%= for {total_distance, week} <- @content do %>
-    <div class={["hidden xl:flex items-center justify-center", cell_border()]}>
-      <.distance distance={total_distance}/>
+  <%= for week <- @content do %>
+    <div class={["hidden xl:flex flex-col items-center justify-center p-4", cell_border()]}>
+      <.distance distance={week.total_distance} class="font-normal" />
+      <div :if={pct = get_in(week, [:compare_prev, :total_distance_diff_pct])} class="flex flex-row items-center font-extralight py-2">
+        <%= if pct > 0 do %>
+          <Heroicons.arrow_up mini class="h-4 text-green-400"/>
+        <% else %>
+          <Heroicons.arrow_down mini class="h-4 text-red-400"/>
+        <% end %>
+        <div>
+          <%= abs(pct) %>%
+        </div>
+      </div>
     </div>
     <div
-      :for={{date, workouts} <- week}
+      :for={{date, workouts} <- week.days}
       id={"cell_#{date}"}
       class={["flex flex-col items-center", cell_border()]}
       dropable="true"

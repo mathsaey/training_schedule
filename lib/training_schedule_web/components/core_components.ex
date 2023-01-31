@@ -15,10 +15,13 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   attr :unit, :string, default: "km"
   attr :distance, :float, required: true
+  attr :class, :string, default: nil
 
   def distance(assigns) do
     ~H"""
-    <p class="break-words font-light"><%= format_distance(@distance) %> <%= @unit %></p>
+    <p class={["break-words font-light", @class]}>
+      <%= format_distance(@distance) %> <%= @unit %>
+    </p>
     """
   end
 
