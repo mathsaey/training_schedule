@@ -19,9 +19,9 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def distance(assigns) do
     ~H"""
-    <p class={["break-words font-light", @class]}>
+    <span class={["break-words font-light", @class]}>
       <%= format_distance(@distance) %> <%= @unit %>
-    </p>
+    </span>
     """
   end
 
