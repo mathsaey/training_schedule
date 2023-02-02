@@ -4,18 +4,18 @@ defmodule TrainingSchedule.Workouts.Template do
   @open ?{
   @close ?}
 
-  not_a_brace = utf8_char([{:not, @open}, {:not, @close}])
-  opening_brace = ascii_char([@open])
-  closing_brace = ascii_char([@close])
+  not_a_brace = utf8_string([{:not, @open}, {:not, @close}], min: 1)
+  close = ignore(ascii_char([@close]))
+  open = ignore(ascii_char([@open]))
 
   wrapped_content =
-    ignore(opening_brace)
-    |> times(not_a_brace, min: 1)
-    |> ignore(closing_brace)
-    |> reduce({Kernel, :to_string, []})
+    open
+    |> concat(not_a_brace)
+    |> concat(close)
+    |> map({String, :trim, []})
     |> unwrap_and_tag(:field)
 
-  other_content = times(not_a_brace, min: 1) |> reduce({Kernel, :to_string, []})
+  other_content = not_a_brace
 
   defparsecp(:_parse, repeat(choice([wrapped_content, other_content])) |> eos(), inline: true)
 
@@ -23,15 +23,8 @@ defmodule TrainingSchedule.Workouts.Template do
 
   def parse(template) do
     case _parse(template) do
-      {:ok, parsed, "", _, _, _} ->
-        {:ok,
-         Enum.map(parsed, fn
-           {:field, str} -> {:field, String.trim(str)}
-           any -> any
-         end)}
-
-      {:error, _, rem, _, _, _} ->
-        {:error, rem}
+      {:ok, parsed, "", _, _, _} -> {:ok, parsed}
+      {:error, _, rem, _, _, _} -> {:error, rem}
     end
   end
 
