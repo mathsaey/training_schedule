@@ -66,4 +66,10 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
   end
 
   defp type(name, user), do: Workouts.get_type_by_name(user.id, name)
+
+  defp inline_code(assigns) do
+    ~H"""
+    <code class="px-1 bg-zinc-400 border"><%= render_slot(@inner_block) %></code>
+    """
+  end
 end

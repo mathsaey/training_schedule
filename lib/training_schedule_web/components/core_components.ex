@@ -172,6 +172,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
   attr :input_class, :string, default: nil
 
   slot :inner_block
+  slot :description
 
   def input(%{field: {f, field}} = assigns) do
     assigns
@@ -279,6 +280,9 @@ defmodule TrainingScheduleWeb.CoreComponents do
         {@rest}
       />
       <.error :for={msg <- @errors} phx-feedback-for={@name}><%= msg %></.error>
+      <p :if={@description != []} class="pt-2 font-light text-justify">
+        <%= render_slot(@description) %>
+      </p>
     </div>
     """
   end

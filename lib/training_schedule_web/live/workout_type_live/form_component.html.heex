@@ -24,10 +24,18 @@
       phx-target={@myself}
       class="flex flex-col justify-between"
     >
-      <div class="overflow-auto">
-        <.input field={{f, :name}} type="text" label="Name" />
+      <div class="overflow-auto max-w-md">
+        <.input field={{f, :name}} class="w-full" type="text" label="Name" />
         <.input field={{f, :color}} class="w-full" type="color" label="Colour" />
-        <.input field={{f, :template}} type="text" label="Content template" />
+        <.input field={{f, :template}} class="w-full" type="text" label="Template">
+          <:description>
+          The workout description shown in the schedule is generated based on this template.
+          When creating a workout of this type, an input is present for every
+          <.inline_code>{ element }</.inline_code> inside the template.
+          In the description, <.inline_code>{ element }</.inline_code> is
+          replaced by the input.
+          </:description>
+        </.input>
       </div>
 
       <div class="flex items-center justify-center">
