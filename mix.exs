@@ -32,7 +32,7 @@ defmodule TrainingSchedule.MixProject do
 
       # Webserver / framework
       {:jason, "~> 1.2"},
-      {:phoenix, "~> 1.7.0-rc.2", override: true},
+      {:phoenix, "~> 1.7", override: true},
       {:plug_cowboy, "~> 2.5"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_ecto, "~> 4.4"},
