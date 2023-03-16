@@ -1,9 +1,8 @@
 version: '3'
 services:
   app:
+    image: ghcr.io/mathsaey/training_schedule:latest
     container_name: training_schedule
-    build: ./training_schedule
-    image: training_schedule
     ports:
       - "9999:4000"
     environment:

@@ -40,9 +40,7 @@ Under development:
 - Copy the `docker-compose.example.yml` file in this repository and adjust it
   as needed.
 
-- `$ git clone git@github.com:mathsaey/training_schedule.git`
-
-- `$ docker-compose build`
+- `$ docker-compose pull`
 
 - `$ docker-compose up`
 
