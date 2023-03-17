@@ -40,8 +40,8 @@ defmodule TrainingSchedule.MixProject do
 
       # Frontend
       {:heroicons, "~> 0.5"},
-      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.6", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
 
       # Database
       {:ecto_sql, "~> 3.6"},
