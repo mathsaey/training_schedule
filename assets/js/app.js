@@ -3,6 +3,8 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+import WorkoutDragAndDropHooks from "./workout-drag-drop"
+
 let Hooks = {}
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
@@ -21,20 +23,12 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
-window.getDropTarget = function (e) {
-  var target = e.target
-  while (!target.attributes.dropable) {
-    target = target.parentElement
-  }
-}
-
 Hooks.WorkoutDragAndDrop = {
-  target(e) {
-    var target = e.target
-    while (!target.attributes.dropable) {
-      target = target.parentElement
+  findDropableParent(el) {
+    while (!el.attributes.dropable) {
+      el = el.parentElement
     }
-    return target
+    return el
    },
 
   mounted() {
@@ -42,33 +36,47 @@ Hooks.WorkoutDragAndDrop = {
     const loadingClass = "opacity-50"
 
     this.el.addEventListener("dragstart", (e) => {
-      e.dataTransfer.dropEffect = "move"
-      e.dataTransfer.setData("text/plain", e.target.id)
+      let workoutId = e.target.id
+      let source = this.findDropableParent(e.target)
+      let data = JSON.stringify({'workout': workoutId, 'source': source.id})
+      e.dataTransfer.setData("text/plain", data)
+      e.dataTransfer.effectAllowed = "copyMove"
     })
 
     this.el.addEventListener("dragenter", e => {
       e.preventDefault()
-      this.target(e).classList.add(...dropClasses)
+      this.findDropableParent(e.target).classList.add(...dropClasses)
     })
 
     this.el.addEventListener("dragleave", e => {
       e.preventDefault()
-      this.target(e).classList.remove(...dropClasses)
+      this.findDropableParent(e.target).classList.remove(...dropClasses)
     })
 
     this.el.addEventListener("drop", e => {
       e.preventDefault()
-      let target = this.target(e)
-      let id = e.dataTransfer.getData("text/plain")
-      let copy = e.altKey || e.ctrlKey || e.metaKey
+      let data = JSON.parse(e.dataTransfer.getData("text/plain"))
+      let dest = this.findDropableParent(e.target)
+      if (dest.id == data.source) { return }
 
-      target.classList.remove(...dropClasses)
-      target.appendChild(e.view.document.getElementById(id))
-      this.pushEvent(
-        "workout_moved", {"workout": id, "target": target.id, "copy?": copy}
-      )
-      // This class is removed when liveview updates the page
-      e.view.document.getElementById(id).children[0].classList.add(loadingClass)
+      let workout = e.view.document.getElementById(data.workout)
+      this.pushEvent("workout_dragged", {
+        "action": e.dataTransfer.dropEffect,
+        "workout": data.workout,
+        "target": dest.id,
+      })
+
+      dest.classList.remove(...dropClasses)
+
+      if (e.dataTransfer.dropEffect == "move") {
+        workout.classList.add(loadingClass)
+        dest.appendChild(workout)
+      } else {
+        let copy = workout.cloneNode(true)
+        copy.id = `${copy.id}_copy_${dest.id}`
+        copy.classList.add(loadingClass)
+        dest.appendChild(copy)
+      }
     })
   }
 }
