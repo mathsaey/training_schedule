@@ -46,12 +46,22 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   end
 
   @impl true
-  def handle_event("workout_moved", %{"workout" => w, "target" => t}, socket) do
-    <<"workout_", id::binary>> = w
-    <<"cell_", date::binary>> = t
-    id |> String.to_integer() |> Workouts.update(%{date: date})
-    PubSub.broadcast(TSPS, "workouts:#{socket.assigns.user.id}", :workouts_changed)
+  def handle_event("workout_moved", data, socket) do
+    %{
+      "workout" => <<"workout_", id::binary>>,
+      "target" => <<"cell_", date::binary>>,
+      "copy?" => copy?
+    } = data
 
+    id = String.to_integer(id)
+
+    if copy? do
+      id |> Workouts.duplicate() |> Workouts.create(%{date: date})
+    else
+      Workouts.update(id, %{date: date})
+    end
+
+    PubSub.broadcast(TSPS, "workouts:#{socket.assigns.user.id}", :workouts_changed)
     {:noreply, load_workouts(socket)}
   end
 

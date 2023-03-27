@@ -37,6 +37,9 @@ defmodule TrainingSchedule.Workouts do
   def get(id), do: Repo.one(from w in Workout, where: w.id == ^id)
   def changeset(workout, attrs \\ %{}), do: Workout.changeset(workout, attrs)
 
+  def duplicate(workout = %Workout{}), do: Workout.duplicate(workout)
+  def duplicate(id), do: id |> get() |> Workout.duplicate()
+
   def create(wo \\ %Workout{}, attrs), do: wo |> Workout.changeset(attrs) |> Repo.insert()
   def create!(wo \\ %Workout{}, attrs), do: wo |> Workout.changeset(attrs) |> Repo.insert!()
 

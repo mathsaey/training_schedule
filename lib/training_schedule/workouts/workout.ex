@@ -22,6 +22,16 @@ defmodule TrainingSchedule.Workouts.Workout do
     |> assoc_constraint(:user)
   end
 
+  def duplicate(workout = %__MODULE__{}) do
+    %__MODULE__{
+      date: workout.date,
+      distance: workout.distance,
+      description_fields: workout.description_fields,
+      user_id: workout.user_id,
+      type_id: workout.type_id
+    }
+  end
+
   def derive_description(workout = %__MODULE__{}) do
     expand = Template.expand(workout.type.template, workout.description_fields)
     %{workout | description: expand}

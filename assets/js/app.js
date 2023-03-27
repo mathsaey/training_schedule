@@ -39,6 +39,7 @@ Hooks.WorkoutDragAndDrop = {
 
   mounted() {
     const dropClasses = ["border-sky-500", "dark:border-sky-500"]
+    const loadingClass = "opacity-50"
 
     this.el.addEventListener("dragstart", (e) => {
       e.dataTransfer.dropEffect = "move"
@@ -59,11 +60,15 @@ Hooks.WorkoutDragAndDrop = {
       e.preventDefault()
       let target = this.target(e)
       let id = e.dataTransfer.getData("text/plain")
+      let copy = e.altKey || e.ctrlKey || e.metaKey
 
       target.classList.remove(...dropClasses)
       target.appendChild(e.view.document.getElementById(id))
-      // TODO: add pending indicator
-      this.pushEvent("workout_moved", {"workout": id, "target": target.id})
+      this.pushEvent(
+        "workout_moved", {"workout": id, "target": target.id, "copy?": copy}
+      )
+      // This class is removed when liveview updates the page
+      e.view.document.getElementById(id).children[0].classList.add(loadingClass)
     })
   }
 }
