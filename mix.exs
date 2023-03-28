@@ -28,7 +28,7 @@ defmodule TrainingSchedule.MixProject do
       # Password hashing
       {:argon2_elixir, "~> 3.1"},
       # Parsing
-      {:nimble_parsec, "~> 1.2"},
+      {:nimble_parsec, "~> 1.3"},
 
       # Webserver / framework
       {:jason, "~> 1.2"},
