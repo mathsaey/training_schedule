@@ -280,7 +280,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
         {@rest}
       />
       <.error :for={msg <- @errors} phx-feedback-for={@name}><%= msg %></.error>
-      <p :if={@description != []} class="pt-2 font-light text-justify">
+      <p :if={@description != []} class="pt-2 font-serif font-light text-justify">
         <%= render_slot(@description) %>
       </p>
     </div>
