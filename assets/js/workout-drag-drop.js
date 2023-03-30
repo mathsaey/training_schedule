@@ -32,11 +32,12 @@ export default {
       e.preventDefault()
       let data = JSON.parse(e.dataTransfer.getData("text/plain"))
       let dest = this.findDropableParent(e.target)
-      if (dest.id == data.source) { return }
+      let action = e.dataTransfer.dropEffect
+      if (dest.id == data.source && action == "move") { return }
 
       let workout = e.view.document.getElementById(data.workout)
       this.pushEvent("workout_dragged", {
-        "action": e.dataTransfer.dropEffect,
+        "action": action,
         "workout": data.workout,
         "target": dest.id,
       })
