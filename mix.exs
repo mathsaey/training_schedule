@@ -50,7 +50,7 @@ defmodule TrainingSchedule.MixProject do
       # Dev / testing tools
       {:tailwind_formatter, "~> 0.3.1", only: :dev, runtime: false},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:sobelow, "~> 0.8", only: :dev, runtime: false},
+      {:sobelow, "~> 0.12", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: :dev, runtime: false},
       {:floki, ">= 0.30.0", only: :test}
     ]
