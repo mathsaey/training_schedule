@@ -31,9 +31,9 @@ defmodule TrainingScheduleWeb.Router do
       live "/from/:from/to/:to/new/:date", ScheduleLive.Index, :new
       live "/from/:from/to/:to/edit/:date/:id", ScheduleLive.Index, :edit
 
-      live "/workouts", WorkoutTypeLive.Index, :index
-      live "/workouts/new", WorkoutTypeLive.Index, :new
-      live "/workouts/edit/:name", WorkoutTypeLive.Index, :edit
+      live "/types", WorkoutTypeLive.Index, :index
+      live "/types/new", WorkoutTypeLive.Index, :new
+      live "/types/edit/:name", WorkoutTypeLive.Index, :edit
 
       get "/logout", AuthController, :logout
     end

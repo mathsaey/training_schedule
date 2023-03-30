@@ -11,12 +11,11 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
     workout = workout(assigns.id, assigns)
     changeset = Workouts.changeset(workout)
     workout_types = Enum.map(assigns.types, &{&1.name, &1.id})
-    type = Workouts.derive_type_template_fields(workout.type)
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:type, type)
+     |> assign(:type, workout.type)
      |> assign(:preview, workout)
      |> assign(:workout, workout)
      |> assign(:changeset, changeset)

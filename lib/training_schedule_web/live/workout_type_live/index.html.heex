@@ -1,13 +1,13 @@
 <.header>Workout Types</.header>
 
 <div class="mb-20 flex flex-col items-center gap-10 sm:flex-row sm:flex-wrap sm:content-start">
-  <.workout_card :for={type <- @workout_types} type={type} action={~p"/workouts/edit/#{type}"} replace>
+  <.workout_card :for={type <- @workout_types} type={type} action={~p"/types/edit/#{type}"} replace>
     <%= type.template %>
   </.workout_card>
 </div>
 
 <div class="flex">
-  <.link_button patch={~p"/workouts/new/"} replace>
+  <.link_button patch={~p"/types/new/"} replace>
     New Workout Type
   </.link_button>
 </div>
@@ -20,6 +20,6 @@
       id={@form_id}
       user={@user}
       action={@live_action}
-      return={~p"/workouts"}
+      return={~p"/types"}
     />
 <% end %>

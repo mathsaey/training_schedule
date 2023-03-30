@@ -1,34 +1,72 @@
 defmodule TrainingSchedule.Workouts do
   import Ecto.Query
-  alias TrainingSchedule.Repo
+  alias TrainingSchedule.{PubSub, Repo}
 
   alias TrainingSchedule.Accounts.User
   alias TrainingSchedule.Workouts.{Type, Workout}
 
-  def list_user_types(%User{id: id}), do: list_user_types(id)
+  def user_types(%User{id: id}), do: user_types(id)
 
-  def list_user_types(user_id) do
-    Repo.all(from t in Type, where: t.user_id == ^user_id, order_by: t.name)
+  def user_types(user_id) do
+    from(t in Type, where: t.user_id == ^user_id, order_by: t.name)
+    |> Repo.all()
+    |> Enum.map(&Type.derive_template_fields/1)
   end
 
-  def get_type(id), do: Repo.one(from t in Type, where: t.id == ^id)
+  def type_by_id(id) do
+    from(t in Type, where: t.id == ^id)
+    |> Repo.one()
+    |> Type.derive_template_fields()
+  end
 
-  def get_type_by_name(user_id, name) do
-    Repo.one(from t in Type, where: t.name == ^name and t.user_id == ^user_id)
+  def type_by_name(user_id, name) do
+    from(t in Type, where: t.name == ^name and t.user_id == ^user_id)
+    |> Repo.one()
+    |> Type.derive_template_fields()
   end
 
   def type_changeset(type, attrs \\ %{}), do: Type.changeset(type, attrs)
 
-  def create_type!(type \\ %Type{}, attrs), do: type |> Type.changeset(attrs) |> Repo.insert!()
-  def create_type(type \\ %Type{}, attrs), do: type |> Type.changeset(attrs) |> Repo.insert()
+  def create_type!(type \\ %Type{}, attrs) do
+    type
+    |> Type.changeset(attrs)
+    |> Repo.insert!()
+    |> then(&maybe_broadcast({:ok, &1}, :types, :create))
+  end
 
-  def update_type(type = %Type{}, attrs), do: type |> Type.changeset(attrs) |> Repo.update()
-  def update_type(id, attrs), do: id |> get_type() |> update_type(attrs)
+  def create_type(type \\ %Type{}, attrs) do
+    type
+    |> Type.changeset(attrs)
+    |> Repo.insert()
+    |> maybe_broadcast(:types, :create)
+  end
 
-  def delete_type(type = %Type{}), do: Repo.delete(type)
-  def delete_type(id), do: id |> get_type() |> delete_type()
+  def update_type(id, attrs) when is_integer(id), do: id |> type_by_id() |> update_type(attrs)
 
-  defdelegate derive_type_template_fields(type), to: Type, as: :derive_template_fields
+  def update_type(type = %Type{}, attrs) do
+    type
+    |> Type.changeset(attrs)
+    |> Repo.update()
+    |> maybe_broadcast(:types, :update)
+  end
+
+  def delete_type(id) when is_integer(id), do: id |> type_by_id() |> delete_type()
+
+  def delete_type(type = %Type{}) do
+    type
+    |> Repo.delete()
+    |> maybe_broadcast(:types, :delete)
+  end
+
+  def dummy_type(user) do
+    Ecto.build_assoc(
+      user,
+      :workout_types,
+      name: "Workout",
+      color: "#D97706",
+      template: "{reps}x{distance}@{speed}"
+    )
+  end
 
   def list_user_workouts(user, from, to) do
     user |> user_workouts() |> workouts_between(from, to) |> Repo.all()
@@ -58,4 +96,12 @@ defmodule TrainingSchedule.Workouts do
   end
 
   defp workouts_between(q, from, to), do: q |> where([w], ^from <= w.date and w.date <= ^to)
+
+  defp maybe_broadcast(t = {:error, _}, _, _), do: t
+
+  defp maybe_broadcast(t = {:ok, type}, topic, action) do
+    Phoenix.PubSub.broadcast(PubSub, "workout_types:#{type.user_id}", {topic, action, type})
+    t
+  end
+
 end

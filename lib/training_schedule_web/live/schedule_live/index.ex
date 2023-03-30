@@ -20,11 +20,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     if connected?(socket), do: Endpoint.subscribe("workouts:#{id}")
     if connected?(socket), do: Endpoint.subscribe("workout_types:#{id}")
 
-    workout_types =
-      id
-      |> Workouts.list_user_types()
-      |> Enum.map(&Workouts.derive_type_template_fields/1)
-
+    workout_types = Workouts.user_types(id)
     {:ok, assign(socket, page_title: "Training Schedule", workout_types: workout_types)}
   end
 
@@ -34,10 +30,10 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   end
 
   @impl true
-  def handle_info(:types_changed, socket) do
+  def handle_info({:types, _, _}, socket) do
     {:noreply,
      socket
-     |> assign(:workout_types, Workouts.list_user_types(socket.assigns.user.id))
+     |> assign(:workout_types, Workouts.user_types(socket.assigns.user.id))
      |> load_workouts()}
   end
 

@@ -14,10 +14,12 @@ defmodule TrainingSchedule.Workouts.Workout do
   end
 
   @doc false
+  # TODO: ensure this can accept integers
   def changeset(workout, attrs) do
     workout
     |> cast(attrs, [:date, :description_fields, :distance, :type_id, :user_id])
     |> validate_required([:date, :distance, :type_id, :user_id])
+    # |> update_change(:distance, &(&1 * 1.0)) # TODO: doesn't seem to fix things
     |> assoc_constraint(:type)
     |> assoc_constraint(:user)
   end
@@ -32,8 +34,10 @@ defmodule TrainingSchedule.Workouts.Workout do
     }
   end
 
-  def derive_description(workout = %__MODULE__{}) do
+  def derive_description(workout = %__MODULE__{description: nil}) do
     expand = Template.expand(workout.type.template, workout.description_fields)
     %{workout | description: expand}
   end
+
+  def derive_description(workout = %__MODULE__{}), do: workout
 end

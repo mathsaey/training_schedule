@@ -1,10 +1,8 @@
 defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
   use TrainingScheduleWeb, :live_component
-  alias TrainingSchedule.Workouts
 
-  alias TrainingSchedule.PubSub, as: TSPS
-  alias Phoenix.PubSub
   alias Ecto.Changeset
+  alias TrainingSchedule.Workouts
 
   @impl true
   def update(assigns, socket) do
@@ -49,27 +47,19 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
   end
 
   defp after_update(socket) do
-    PubSub.broadcast(TSPS, "workout_types:#{socket.assigns.user.id}", :types_changed)
-
     socket
-    |> push_patch(to: ~p"/workouts", replace: true)
+    |> push_patch(to: ~p"/types", replace: true)
     |> then(&{:noreply, &1})
   end
 
-  defp type(:new, user) do
-    %{
-      Ecto.build_assoc(user, :workout_types)
-      | name: "Workout",
-        color: "#D97706",
-        template: "{reps}x{distance}@{speed}"
-    }
-  end
-
-  defp type(name, user), do: Workouts.get_type_by_name(user.id, name)
+  defp type(:new, user), do: Workouts.dummy_type(user)
+  defp type(name, user), do: Workouts.type_by_name(user.id, name)
 
   defp inline_code(assigns) do
     ~H"""
-    <code class="px-1 bg-zinc-400 font-mono border"><%= render_slot(@inner_block) %></code>
+    <code class="px-1 bg-zinc-400 font-mono border">
+      <%= render_slot(@inner_block) %>
+    </code>
     """
   end
 end
