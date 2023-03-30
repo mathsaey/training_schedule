@@ -1,5 +1,5 @@
 defmodule TrainingSchedule.Workouts do
-  import Ecto.Query
+  import Ecto.Query, except: [update: 2]
   alias TrainingSchedule.{PubSub, Repo}
 
   alias TrainingSchedule.Accounts.User
@@ -24,6 +24,13 @@ defmodule TrainingSchedule.Workouts do
     |> Repo.one()
     |> Type.derive_template_fields()
   end
+
+  defp types_by_ids(ids) do
+    from(t in Type, where: t.id in ^ids)
+    |> Repo.all()
+    |> Enum.map(&Type.derive_template_fields/1)
+  end
+
 
   def type_changeset(type, attrs \\ %{}), do: Type.changeset(type, attrs)
 
@@ -63,45 +70,74 @@ defmodule TrainingSchedule.Workouts do
       user,
       :workout_types,
       name: "Workout",
-      color: "#D97706",
-      template: "{reps}x{distance}@{speed}"
+      color: "#0e7490",
+      temlate: "",
+      template_fields: []
     )
   end
 
-  def list_user_workouts(user, from, to) do
-    user |> user_workouts() |> workouts_between(from, to) |> Repo.all()
+  def user_workouts(%User{id: id}, from, to), do: user_workouts(id, from, to)
+
+  def user_workouts(user_id, from, to) when is_integer(user_id) do
+    from(
+      w in Workout,
+      where: w.user_id == ^user_id and ^from <= w.date and w.date <= ^to,
+      preload: [type: ^&types_by_ids/1],
+      order_by: w.date
+    )
+    |> Repo.all()
+    |> Enum.map(&Workout.derive_description/1)
   end
 
-  def get(id), do: Repo.one(from w in Workout, where: w.id == ^id)
+  def get(id) do
+    from(w in Workout, where: w.id == ^id, preload: :type)
+    |> Repo.one()
+    |> Workout.derive_description()
+    |> Map.update!(:type, &Type.derive_template_fields/1)
+  end
+
   def changeset(workout, attrs \\ %{}), do: Workout.changeset(workout, attrs)
 
   def duplicate(workout = %Workout{}), do: Workout.duplicate(workout)
   def duplicate(id), do: id |> get() |> Workout.duplicate()
 
-  def create(wo \\ %Workout{}, attrs), do: wo |> Workout.changeset(attrs) |> Repo.insert()
-  def create!(wo \\ %Workout{}, attrs), do: wo |> Workout.changeset(attrs) |> Repo.insert!()
-
-  def update(wo = %Workout{}, attrs), do: wo |> Workout.changeset(attrs) |> Repo.update()
-  def update(id, attrs), do: id |> get() |> Workout.changeset(attrs) |> Repo.update()
-
-  def delete(workout = %Workout{}), do: workout |> Repo.delete()
-  def delete(id), do: id |> get() |> Repo.delete()
-
-  defdelegate derive_description(workout), to: Workout
-
-  defp user_workouts(%User{id: id}), do: user_workouts(id)
-
-  defp user_workouts(user_id) do
-    from(w in Workout, where: w.user_id == ^user_id, order_by: w.date, preload: :type)
+  def create!(wo \\ %Workout{}, attrs) do
+    wo
+    |> Workout.changeset(attrs)
+    |> Repo.insert!()
+    |> then(&maybe_broadcast({:ok, &1}, :workouts, :create))
   end
 
-  defp workouts_between(q, from, to), do: q |> where([w], ^from <= w.date and w.date <= ^to)
+  def create(wo \\ %Workout{}, attrs) do
+    wo
+    |> Workout.changeset(attrs)
+    |> Repo.insert()
+    |> maybe_broadcast(:workouts, :create)
+  end
+
+  def update(id, attrs) when is_integer(id), do: id |> get() |> update(attrs)
+
+  def update(wo = %Workout{}, attrs) do
+    wo
+    |> Workout.changeset(attrs)
+    |> Repo.update()
+    |> maybe_broadcast(:workouts, :update)
+  end
+
+  def delete(id) when is_integer(id), do: id |> get() |> Repo.delete()
+
+  def delete(workout = %Workout{}) do
+    workout
+    |> Repo.delete()
+    |> maybe_broadcast(:workouts, :delete)
+  end
+
+  def dummy(user), do: Ecto.build_assoc(user, :workouts, type: dummy_type(user))
 
   defp maybe_broadcast(t = {:error, _}, _, _), do: t
 
-  defp maybe_broadcast(t = {:ok, type}, topic, action) do
-    Phoenix.PubSub.broadcast(PubSub, "workout_types:#{type.user_id}", {topic, action, type})
+  defp maybe_broadcast(t = {:ok, item}, topic, action) do
+    Phoenix.PubSub.broadcast(PubSub, "workouts:#{item.user_id}", {topic, action, item})
     t
   end
-
 end

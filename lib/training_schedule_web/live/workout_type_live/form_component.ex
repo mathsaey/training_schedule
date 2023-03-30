@@ -52,14 +52,9 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
     |> then(&{:noreply, &1})
   end
 
-  defp type(:new, user), do: Workouts.dummy_type(user)
-  defp type(name, user), do: Workouts.type_by_name(user.id, name)
-
-  defp inline_code(assigns) do
-    ~H"""
-    <code class="px-1 bg-zinc-400 font-mono border">
-      <%= render_slot(@inner_block) %>
-    </code>
-    """
+  defp type(:new, user) do
+    %{Workouts.dummy_type(user) | template: "{reps}x{distance}@{speed}"}
   end
+
+  defp type(name, user), do: Workouts.type_by_name(user.id, name)
 end

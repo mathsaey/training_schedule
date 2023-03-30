@@ -138,6 +138,14 @@ defmodule TrainingScheduleWeb.CoreComponents do
     "inline-block bg-sky-500 text-slate-100 rounded-md py-2 px-4 mt-4 hover:ring-2"
   end
 
+  def inline_code(assigns) do
+    ~H"""
+    <code class="px-1 bg-zinc-400 font-mono border">
+      <%= render_slot(@inner_block) %>
+    </code>
+    """
+  end
+
   @doc """
   Renders an input with label and error messages.
 

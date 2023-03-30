@@ -30,9 +30,17 @@ defmodule TrainingSchedule.Workouts.Workout do
       distance: workout.distance,
       description_fields: workout.description_fields,
       user_id: workout.user_id,
-      type_id: workout.type_id
+      type_id: workout.type_id,
+      type: workout.type,
+      user: workout.user
     }
   end
+
+  def derive_description(cs = %Ecto.Changeset{valid?: true, changes: %{description_fields: f}}) do
+    change(cs, description: Template.expand(get_field(cs, :type).template, f))
+  end
+
+  def derive_description(cs = %Ecto.Changeset{}), do: cs
 
   def derive_description(workout = %__MODULE__{description: nil}) do
     expand = Template.expand(workout.type.template, workout.description_fields)

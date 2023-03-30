@@ -10,8 +10,8 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     %User{id: id} = socket.assigns.user
-    if connected?(socket), do: Endpoint.subscribe("workout_types:#{id}")
-    {:ok, assign(socket, :workout_types, Workouts.user_types(id))}
+    if connected?(socket), do: Endpoint.subscribe("workouts:#{id}")
+    {:ok, assign(socket, :types, Workouts.user_types(id))}
   end
 
   @impl true
@@ -20,11 +20,16 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.Index do
   end
 
   @impl true
-  def handle_info({:types, _, _} , socket) do
-    {:noreply, assign(socket, :workout_types, Workouts.user_types(socket.assigns.user.id))}
+  def handle_info({:types, _, _}, socket) do
+    {:noreply, assign(socket, :types, Workouts.user_types(socket.assigns.user.id))}
   end
 
-  defp action(socket, :index, _), do: assign(socket, :page_title, "Workout Types")
+  def handle_info(_, socket), do: {:noreply, socket}
+
+  defp action(socket, :index, _) do
+    socket
+    |> assign(:page_title, "Workout Types")
+  end
 
   defp action(socket, :new, _) do
     socket

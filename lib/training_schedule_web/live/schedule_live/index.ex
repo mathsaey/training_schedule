@@ -1,9 +1,6 @@
 defmodule TrainingScheduleWeb.ScheduleLive.Index do
   use TrainingScheduleWeb, :live_view
 
-  alias Phoenix.PubSub
-  alias TrainingSchedule.PubSub, as: TSPS
-
   alias TrainingSchedule.Workouts
   alias TrainingSchedule.Accounts.User
   alias TrainingScheduleWeb.Endpoint
@@ -18,10 +15,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   def mount(_, _, socket) do
     %User{id: id} = socket.assigns.user
     if connected?(socket), do: Endpoint.subscribe("workouts:#{id}")
-    if connected?(socket), do: Endpoint.subscribe("workout_types:#{id}")
-
-    workout_types = Workouts.user_types(id)
-    {:ok, assign(socket, page_title: "Training Schedule", workout_types: workout_types)}
+    {:ok, assign(socket, page_title: "Training Schedule")}
   end
 
   @impl true
@@ -30,16 +24,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   end
 
   @impl true
-  def handle_info({:types, _, _}, socket) do
-    {:noreply,
-     socket
-     |> assign(:workout_types, Workouts.user_types(socket.assigns.user.id))
-     |> load_workouts()}
-  end
-
-  def handle_info(:workouts_changed, socket) do
-    {:noreply, load_workouts(socket)}
-  end
+  def handle_info(_, socket), do: {:noreply, load_workouts(socket)}
 
   @impl true
   def handle_event("workout_dragged", data, socket) do
@@ -56,7 +41,6 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
       "move" -> Workouts.update(id, %{date: date})
     end
 
-    PubSub.broadcast(TSPS, "workouts:#{socket.assigns.user.id}", :workouts_changed)
     {:noreply, load_workouts(socket)}
   end
 
@@ -119,8 +103,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   defp load_workouts(socket) do
     workouts =
       socket.assigns.user.id
-      |> Workouts.list_user_workouts(socket.assigns.from, socket.assigns.to)
-      |> Enum.map(&Workouts.derive_description/1)
+      |> Workouts.user_workouts(socket.assigns.from, socket.assigns.to)
 
     socket
     |> assign(:workouts, workouts)

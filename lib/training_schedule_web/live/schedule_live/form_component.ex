@@ -1,26 +1,26 @@
 defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
   use TrainingScheduleWeb, :live_component
   alias TrainingSchedule.Workouts
-
-  alias TrainingSchedule.PubSub, as: TSPS
-  alias Phoenix.PubSub
   alias Ecto.Changeset
 
   @impl true
   def update(assigns, socket) do
     workout = workout(assigns.id, assigns)
-    changeset = Workouts.changeset(workout)
-    workout_types = Enum.map(assigns.types, &{&1.name, &1.id})
+    types = Workouts.user_types(assigns.user)
 
     {:ok,
      socket
      |> assign(assigns)
      |> assign(:type, workout.type)
+     |> assign(:types, types)
      |> assign(:preview, workout)
      |> assign(:workout, workout)
-     |> assign(:changeset, changeset)
-     |> assign(:workout_types, workout_types)}
+     |> assign(:changeset, Workouts.changeset(workout))
+     |> assign(:dummy_type, Workouts.dummy_type(assigns.user))}
   end
+
+  defp workout(:new, assigns), do: Workouts.dummy(assigns.user)
+  defp workout(id, _), do: id |> String.to_integer() |> Workouts.get()
 
   @impl true
   def handle_event("change", %{"workout" => params}, socket) do
@@ -29,9 +29,10 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
       |> Workouts.changeset(params)
       |> Map.replace!(:action, :validate)
 
+    # Avoid repetitive querying to generate the preview, search in the preloaded list of types
     type_id = Changeset.fetch_field!(changeset, :type_id)
-    type = Enum.find(socket.assigns.types, dummy_type(), &(&1.id == type_id))
-    preview = %{Changeset.apply_changes(changeset) | type: type} |> Workouts.derive_description()
+    type = Enum.find(socket.assigns.types, socket.assigns.dummy_type, &(&1.id == type_id))
+    preview = %{Changeset.apply_changes(changeset) | type: type}
 
     {:noreply,
      socket
@@ -60,28 +61,9 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
   end
 
   def after_update(socket) do
-    PubSub.broadcast(TSPS, "workouts:#{socket.assigns.user.id}", :workouts_changed)
     {:noreply, push_patch(socket, to: ~p"/from/#{socket.assigns.from}/to/#{socket.assigns.to}", replace: true)}
   end
 
-  def workout(:new, assigns) do
-    %{
-      Ecto.build_assoc(assigns.user, :workouts)
-      | distance: 0,
-        type: dummy_type(),
-        description_fields: %{}
-    }
-  end
-
-  def workout(id, assigns) when is_binary(id) do
-    workout = id |> String.to_integer() |> Workouts.get()
-    type = Enum.find(assigns.types, dummy_type(), &(&1.id == workout.type_id))
-    %{workout | type: type} |> Workouts.derive_description()
-  end
-
-  defp dummy_type do
-    %Workouts.Type{name: "Workout", color: "#0e7490", template: "", template_fields: []}
-  end
 
   attr :form, :any, required: true
   attr :type, :any, required: true

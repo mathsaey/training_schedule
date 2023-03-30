@@ -33,10 +33,9 @@
           type="select"
           label="Workout Type"
           prompt=""
-          options={@workout_types}
+          options={Enum.map(@types, &{&1.name, &1.id})}
         />
-        <%# TODO: consider if this is the best way to do this %>
-        <.input field={{f, :distance}} phx-mounted={JS.focus()} type="number" step="any" min="0" label="Distance" />
+        <.input field={{f, :distance}} type="number" step="any" min="0" label="Distance" />
         <.input field={{f, :date}} value={@date} type="hidden" />
 
         <.description_field_inputs form={f} type={@type} />
