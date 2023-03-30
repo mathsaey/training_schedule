@@ -69,7 +69,7 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
 
   defp inline_code(assigns) do
     ~H"""
-    <code class="px-1 bg-zinc-400 border"><%= render_slot(@inner_block) %></code>
+    <code class="px-1 bg-zinc-400 font-mono border"><%= render_slot(@inner_block) %></code>
     """
   end
 end
