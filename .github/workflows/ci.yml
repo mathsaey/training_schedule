@@ -1,0 +1,78 @@
+name: CI
+on: [push, pull_request]
+
+env:
+  ELIXIR_VERSION: 1.14.3
+  OTP_VERSION: 25.2.1
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Compile and check warnings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/ci-setup.yml
+      - run: mix compile --all-warnings --warnings-as-errors
+
+
+
+
+# jobs:
+#   typecheck:
+#     runs-on: ubuntu-latest
+#     name: Check type annotations with Dialyzer
+#     strategy:
+#       matrix:
+#         otp: ['25.0']
+#         elixir: ['1.14.1']
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: erlef/setup-beam@v1
+#         with:
+#           otp-version: ${{matrix.otp}}
+#           elixir-version: ${{matrix.elixir}}
+#       - name: Get Elixir dependencies
+#         run: mix deps.get
+#       - name: Run dialyzer to check type annotations
+#         run: mix dialyzer --format github
+
+#   test:
+#     runs-on: ubuntu-latest
+#     name: Run tests
+#     strategy:
+#       matrix:
+#         otp: ['25.0']
+#         elixir: ['1.14.1']
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: erlef/setup-beam@v1
+#         with:
+#           otp-version: ${{matrix.otp}}
+#           elixir-version: ${{matrix.elixir}}
+#       - name: Get Elixir dependencies
+#         run: mix deps.get
+#       - name: Start epmd for distributed tests
+#         run: epmd -daemon
+#       - name: Run Elixir tests
+#         run: mix test --include remote:true
+
+#   format:
+#     runs-on: ubuntu-latest
+#     name: Check Elixir formatting
+#     strategy:
+#       matrix:
+#         otp: ['25.0']
+#         elixir: ['1.14.1']
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: erlef/setup-beam@v1
+#         with:
+#           otp-version: ${{matrix.otp}}
+#           elixir-version: ${{matrix.elixir}}
+#       - name: Get Elixir dependencies
+#         run: mix deps.get
+#       - name: Check code formatting
+#         run: mix format --check-formatted
+
