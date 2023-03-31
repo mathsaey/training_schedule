@@ -1,0 +1,37 @@
+name: mix setup
+description: Set up the environment for a mix project.
+
+inputs:
+  cache-prefix:
+    description: Prefix to add to the cache name.
+    required: false
+    default: default
+
+runs:
+  using: composite
+  steps:
+    - uses: erlef/setup-beam@v1
+      with:
+        otp-version: ${{ env.OTP_VERSION }}
+        elixir-version: ${{ env.ELIXIR_VERSION }}
+
+    # We store the deps separately as they do not depend on the elixir / otp
+    # version or environment.
+    - name: Restore deps cache
+      uses: actions/cache@v3
+      with:
+        path: deps
+        key: deps-mix-${{ hashFiles('**/mix.lock') }}
+    - name: Get dependencies
+      run: mix deps.get
+      shell: bash
+
+    - name: Restore _build cache
+      uses: actions/cache@v3
+      with:
+        path: _build
+        key: ${{ inputs.cache-prefix }}-otp-${{ env.OTP_VERSION }}-elixir-${{ env.ELIXIR_VERSION }}-mix-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ inputs.cache-prefix }}-otp-${{ env.OTP_VERSION }}-elixir-${{ env.ELIXIR_VERSION }}-mix-
+    - name: Compile dependencies
+      run: mix deps.compile
+      shell: bash

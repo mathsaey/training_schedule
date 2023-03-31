@@ -6,73 +6,55 @@ env:
   OTP_VERSION: 25.2.1
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   compile:
-    name: Compile and check warnings
+    name: compiler output
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/ci-setup.yml
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/mix-setup
       - run: mix compile --all-warnings --warnings-as-errors
 
+  format:
+    name: formatting
+    runs-on: ubuntu-latest
+    needs: compile
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/mix-setup
+      - run: mix format --check-formatted
 
+  test:
+    name: tests
+    runs-on: ubuntu-latest
+    needs: compile
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/mix-setup
+        with:
+          cache-prefix: test
+      - run: mix test
 
+  dialyzer:
+    name: typechecks
+    runs-on: ubuntu-latest
+    needs: compile
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/mix-setup
+        with:
+          cache-prefix: dialyzer
+      - run: mix dialyzer --format github
 
-# jobs:
-#   typecheck:
-#     runs-on: ubuntu-latest
-#     name: Check type annotations with Dialyzer
-#     strategy:
-#       matrix:
-#         otp: ['25.0']
-#         elixir: ['1.14.1']
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: erlef/setup-beam@v1
-#         with:
-#           otp-version: ${{matrix.otp}}
-#           elixir-version: ${{matrix.elixir}}
-#       - name: Get Elixir dependencies
-#         run: mix deps.get
-#       - name: Run dialyzer to check type annotations
-#         run: mix dialyzer --format github
-
-#   test:
-#     runs-on: ubuntu-latest
-#     name: Run tests
-#     strategy:
-#       matrix:
-#         otp: ['25.0']
-#         elixir: ['1.14.1']
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: erlef/setup-beam@v1
-#         with:
-#           otp-version: ${{matrix.otp}}
-#           elixir-version: ${{matrix.elixir}}
-#       - name: Get Elixir dependencies
-#         run: mix deps.get
-#       - name: Start epmd for distributed tests
-#         run: epmd -daemon
-#       - name: Run Elixir tests
-#         run: mix test --include remote:true
-
-#   format:
-#     runs-on: ubuntu-latest
-#     name: Check Elixir formatting
-#     strategy:
-#       matrix:
-#         otp: ['25.0']
-#         elixir: ['1.14.1']
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: erlef/setup-beam@v1
-#         with:
-#           otp-version: ${{matrix.otp}}
-#           elixir-version: ${{matrix.elixir}}
-#       - name: Get Elixir dependencies
-#         run: mix deps.get
-#       - name: Check code formatting
-#         run: mix format --check-formatted
-
+  # TODO: set this up once we verify which checks we want
+  # credo:
+  #   name: code style
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/actions/mix-setup
+  #     - run: mix credo --figure-out-options
