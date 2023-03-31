@@ -73,7 +73,7 @@ defmodule TrainingScheduleWeb.AuthController do
     end)
     |> assign_new(:user, fn
       %{user_id: :error} -> :error
-      %{user_id: id} -> Accounts.get_user_by_id(id)
+      %{user_id: id} -> Accounts.by_id(id)
     end)
     |> case do
       %Socket{assigns: %{user: :error}} -> {:halt, redirect(socket, to: login_path())}

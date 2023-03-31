@@ -24,6 +24,7 @@ defmodule TrainingSchedule.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import TrainingSchedule.DataCase
+      import TrainingSchedule.TestFixtures
     end
   end
 
