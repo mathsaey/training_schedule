@@ -42,6 +42,15 @@ defmodule TrainingSchedule.DataCase do
   end
 
   @doc """
+  Spawn a function which has access to the sandbox.
+  """
+  def spawn_sandboxed(fun) do
+    pid = spawn(fn -> receive(do: (:start -> fun.())) end)
+    Ecto.Adapters.SQL.Sandbox.allow(TrainingSchedule.Repo, self(), pid)
+    send(pid, :start)
+  end
+
+  @doc """
   A helper that transforms changeset errors into a map of messages.
 
       assert {:error, changeset} = Accounts.create_user(%{password: "short"})

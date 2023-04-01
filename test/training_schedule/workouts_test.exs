@@ -1,6 +1,7 @@
 defmodule TrainingSchedule.WorkoutsTest do
   use TrainingSchedule.DataCase, async: true
 
+  alias Phoenix.PubSub
   alias TrainingSchedule.Workouts
   alias TrainingSchedule.Workouts.{Type, Workout}
 
@@ -10,12 +11,14 @@ defmodule TrainingSchedule.WorkoutsTest do
 
   describe "create_type(!)/1" do
     setup %{user: user} do
-      [attributes: %{
-        name: "Workout",
-        color: "#000000",
-        user_id: user.id,
-        template: "{ times }x100m",
-      }]
+      [
+        attributes: %{
+          name: "Workout",
+          color: "#000000",
+          user_id: user.id,
+          template: "{ times }x100m"
+        }
+      ]
     end
 
     test "smoke test", %{attributes: attrs} do
@@ -43,9 +46,11 @@ defmodule TrainingSchedule.WorkoutsTest do
       assert_raise(Ecto.InvalidChangesetError, fn ->
         Workouts.create_type!(%Type{}, Map.delete(attrs, :name))
       end)
+
       assert_raise(Ecto.InvalidChangesetError, fn ->
         Workouts.create_type!(%Type{}, Map.delete(attrs, :color))
       end)
+
       assert_raise(Ecto.InvalidChangesetError, fn ->
         Workouts.create_type!(%Type{}, Map.delete(attrs, :user_id))
       end)
@@ -62,6 +67,7 @@ defmodule TrainingSchedule.WorkoutsTest do
       assert_raise(Ecto.InvalidChangesetError, fn ->
         Workouts.create_type!(%Type{}, %{attrs | name: "x"})
       end)
+
       assert_raise(Ecto.InvalidChangesetError, fn ->
         Workouts.create_type!(%Type{}, %{attrs | name: longname})
       end)
@@ -105,9 +111,15 @@ defmodule TrainingSchedule.WorkoutsTest do
 
       {:ok, _} = Workouts.create_type(%{attrs | user_id: alt_user.id})
     end
+
+    test "publishes message", %{user: user, attributes: attrs} do
+      PubSub.subscribe(TrainingSchedule.PubSub, "workouts:#{user.id}")
+      spawn_sandboxed(fn -> Workouts.create_type!(attrs) end)
+      assert_receive {:types, :create, _type}
+    end
   end
 
-  describe "workout types" do
+  describe "workout type" do
     setup %{user: user} do
       attrs = %{color: "#000000", user_id: user.id, template: "{reps}"}
       {:ok, t1} = Workouts.create_type!(Map.merge(attrs, %{name: "type1"}))
@@ -116,11 +128,11 @@ defmodule TrainingSchedule.WorkoutsTest do
     end
 
     test "retrieval", %{user: user, type1: t1, type2: t2} do
-      ids = user |> Workouts.user_types() |> Enum.map(&(&1.id))
+      ids = user |> Workouts.user_types() |> Enum.map(& &1.id)
       assert t1.id in ids
       assert t2.id in ids
 
-      ids = user.id |> Workouts.user_types() |> Enum.map(&(&1.id))
+      ids = user.id |> Workouts.user_types() |> Enum.map(& &1.id)
       assert t1.id in ids
       assert t2.id in ids
 
@@ -142,6 +154,37 @@ defmodule TrainingSchedule.WorkoutsTest do
 
       assert Workouts.type_by_name(user.id, t1.name).template_fields == ["reps"]
       assert Workouts.type_by_name(user.id, t2.name).template_fields == ["reps"]
+    end
+
+    test "update", %{type1: t1, type2: t2} do
+      {:ok, t1} = Workouts.update_type(t1, %{name: "new name"})
+      {:ok, t2} = Workouts.update_type(t2.id, %{template: "new template"})
+
+      assert Workouts.type_by_id(t1.id).name == "new name"
+      assert Workouts.type_by_id(t2.id).template_fields == []
+    end
+
+    test "update publishes message", %{user: user, type1: type} do
+      PubSub.subscribe(TrainingSchedule.PubSub, "workouts:#{user.id}")
+      spawn_sandboxed(fn -> Workouts.update_type(type, %{name: "new name"}) end)
+      assert_receive {:types, :update, _type}
+    end
+
+    test "deletion", %{type1: t1, type2: t2} do
+      assert Workouts.type_by_id(t1.id).id == t1.id
+      assert Workouts.type_by_id(t2.id).id == t2.id
+
+      {:ok, t1} = Workouts.delete_type(t1)
+      {:ok, t2} = Workouts.delete_type(t2.id)
+
+      assert Workouts.type_by_id(t1.id) == nil
+      assert Workouts.type_by_id(t2.id) == nil
+    end
+
+    test "deletion publishes message", %{user: user, type1: type} do
+      PubSub.subscribe(TrainingSchedule.PubSub, "workouts:#{user.id}")
+      spawn_sandboxed(fn -> Workouts.delete_type(type) end)
+      assert_receive {:types, :delete, _type}
     end
   end
 end

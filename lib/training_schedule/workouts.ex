@@ -57,11 +57,9 @@ defmodule TrainingSchedule.Workouts do
 
   def update_type(type = %Type{}, attrs) do
     type
-    |> IO.inspect()
     |> Type.changeset(attrs)
     |> Repo.update()
     |> maybe_broadcast(:types, :update)
-    |> IO.inspect()
   end
 
   def delete_type(id) when is_integer(id), do: id |> type_by_id() |> delete_type()
