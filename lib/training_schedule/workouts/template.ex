@@ -31,8 +31,6 @@ defmodule TrainingSchedule.Workouts.Template do
 
   defparsecp(:_parse, repeat(choice([wrapped_content, other_content])) |> eos(), inline: true)
 
-  defp parse(nil), do: {:ok, []}
-
   defp parse(template) do
     case _parse(template) do
       {:ok, parsed, "", _, _, _} -> {:ok, parsed}
@@ -49,6 +47,8 @@ defmodule TrainingSchedule.Workouts.Template do
   ## Examples
 
       iex> expand("{reps}x{distance}", %{"reps" => "5", "distance" => "400m"})
+      ["5", "x", "400m"]
+      iex> expand("{reps}x{distance}", %{"reps" => "5", "distance" => "400m", "extra" => "ignore"})
       ["5", "x", "400m"]
       iex> expand("Race time!", %{"reps" => "5", "distance" => "400m"})
       ["Race time!"]

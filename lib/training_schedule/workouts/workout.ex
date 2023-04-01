@@ -22,6 +22,7 @@ defmodule TrainingSchedule.Workouts.Workout do
     # |> update_change(:distance, &(&1 * 1.0)) # TODO: doesn't seem to fix things
     |> assoc_constraint(:type)
     |> assoc_constraint(:user)
+    |> derive_description()
   end
 
   def duplicate(workout = %__MODULE__{}) do
@@ -36,8 +37,13 @@ defmodule TrainingSchedule.Workouts.Workout do
     }
   end
 
-  def derive_description(cs = %Ecto.Changeset{valid?: true, changes: %{description_fields: f}}) do
-    change(cs, description: Template.expand(get_field(cs, :type).template, f))
+  def derive_description(cs = %Ecto.Changeset{valid?: true, changes: changes}) do
+    if Map.has_key?(changes, :type_id) or Map.has_key?(changes, :description_fields) do
+      fields = get_field(cs, :description_fields)
+      change(cs, description: Template.expand(get_field(cs, :type).template, fields))
+    else
+      cs
+    end
   end
 
   def derive_description(cs = %Ecto.Changeset{}), do: cs

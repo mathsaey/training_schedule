@@ -11,7 +11,7 @@ defmodule TrainingSchedule.Repo.Migrations.CreateUsersTypesWorkouts do
       timestamps()
     end
 
-    create table("user_tokens", primary_key: false) do
+    create table("tokens", primary_key: false) do
       add :id, :binary_id, primary_key: true, null: false, size: 16
       add :user_id, references("users", on_delete: :delete_all)
       add :challenge, :binary, null: false, size: 32
@@ -24,7 +24,7 @@ defmodule TrainingSchedule.Repo.Migrations.CreateUsersTypesWorkouts do
 
       add :name, :string, size: 60, null: false
       add :color, :string, size: 7
-      add :template, :string, size: 140
+      add :template, :string, null: false, default: "", size: 140
     end
 
     create table(:workouts) do

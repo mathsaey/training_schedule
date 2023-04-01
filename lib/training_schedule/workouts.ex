@@ -1,4 +1,10 @@
 defmodule TrainingSchedule.Workouts do
+  @moduledoc """
+  Workouts context.
+
+  This context groups most of the functionality related to workouts.
+  """
+
   import Ecto.Query, except: [update: 2]
   alias TrainingSchedule.{PubSub, Repo}
 
@@ -31,7 +37,6 @@ defmodule TrainingSchedule.Workouts do
     |> Enum.map(&Type.derive_template_fields/1)
   end
 
-
   def type_changeset(type, attrs \\ %{}), do: Type.changeset(type, attrs)
 
   def create_type!(type \\ %Type{}, attrs) do
@@ -52,9 +57,11 @@ defmodule TrainingSchedule.Workouts do
 
   def update_type(type = %Type{}, attrs) do
     type
+    |> IO.inspect()
     |> Type.changeset(attrs)
     |> Repo.update()
     |> maybe_broadcast(:types, :update)
+    |> IO.inspect()
   end
 
   def delete_type(id) when is_integer(id), do: id |> type_by_id() |> delete_type()
@@ -82,7 +89,7 @@ defmodule TrainingSchedule.Workouts do
     from(
       w in Workout,
       where: w.user_id == ^user_id and ^from <= w.date and w.date <= ^to,
-      preload: [type: ^&types_by_ids/1],
+      preload: [type: ^(&types_by_ids/1)],
       order_by: w.date
     )
     |> Repo.all()
