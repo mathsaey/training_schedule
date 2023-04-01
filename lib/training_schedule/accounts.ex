@@ -25,6 +25,7 @@ defmodule TrainingSchedule.Accounts do
   @spec authenticate(String.t(), String.t()) :: {:ok, Token.t()} | :error
   def authenticate(username, password) do
     account = by_username(username)
+
     if User.valid_password?(account, password) do
       {:ok, Token.create(account.id)}
     else
