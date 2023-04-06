@@ -4,7 +4,6 @@ defmodule TrainingSchedule.Workouts do
 
   This context groups most of the functionality related to workouts.
   """
-
   import Ecto.Query, except: [update: 2]
   alias TrainingSchedule.{PubSub, Repo}
 
@@ -65,7 +64,7 @@ defmodule TrainingSchedule.Workouts do
     from(
       w in Workout,
       where: w.user_id == ^user_id and ^from <= w.date and w.date <= ^to,
-      preload: [:type],
+      preload: [type: ^fn _ -> user_types(user_id) end],
       order_by: w.date
     )
     |> Repo.all()
@@ -73,7 +72,7 @@ defmodule TrainingSchedule.Workouts do
   end
 
   def get(id) do
-    from(w in Workout, where: w.id == ^id, preload: :type)
+    from(w in Workout, where: w.id == ^id, preload: [:type])
     |> Repo.one()
     |> Workout.derive_description()
     |> Map.update!(:type, &Type.derive_template_fields/1)
