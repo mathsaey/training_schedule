@@ -4,8 +4,8 @@
 #   the run phase uses a stripped down container which executes the release.
 
 ARG ELIXIR_VERSION=1.14.3
-ARG OTP_VERSION=25.2.1
-ARG DEBIAN_VERSION=buster-20230109-slim
+ARG OTP_VERSION=25.3
+ARG DEBIAN_VERSION=buster-20230227-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 

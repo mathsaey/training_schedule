@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 env:
   ELIXIR_VERSION: 1.14.3
-  OTP_VERSION: 25.2.1
+  OTP_VERSION: 25.3
 permissions:
   contents: read
 concurrency:
