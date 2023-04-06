@@ -15,6 +15,7 @@ defmodule TrainingSchedule.DataCase do
   """
 
   use ExUnit.CaseTemplate
+  alias TrainingSchedule.Repo
 
   using do
     quote do
@@ -30,6 +31,7 @@ defmodule TrainingSchedule.DataCase do
 
   setup tags do
     TrainingSchedule.DataCase.setup_sandbox(tags)
+    TrainingSchedule.DataCase.setup_type_cache(tags)
     :ok
   end
 
@@ -37,8 +39,18 @@ defmodule TrainingSchedule.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(TrainingSchedule.Repo, shared: not tags[:async])
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  end
+
+  @doc """
+  Ensure the type cache can access the database and reset it.
+
+  Note that the type cache ets table may contain data from previous test runs. However, since
+  every created user has a separate user_id, this should not affect the test results.
+  """
+  def setup_type_cache(_) do
+    Ecto.Adapters.SQL.Sandbox.allow(Repo, self(), TrainingSchedule.Workouts.TypeCache)
   end
 
   @doc """
@@ -46,7 +58,7 @@ defmodule TrainingSchedule.DataCase do
   """
   def spawn_sandboxed(fun) do
     pid = spawn(fn -> receive(do: (:start -> fun.())) end)
-    Ecto.Adapters.SQL.Sandbox.allow(TrainingSchedule.Repo, self(), pid)
+    Ecto.Adapters.SQL.Sandbox.allow(Repo, self(), pid)
     send(pid, :start)
   end
 

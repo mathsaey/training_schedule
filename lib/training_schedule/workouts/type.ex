@@ -63,8 +63,6 @@ defmodule TrainingSchedule.Workouts.Type do
   defp change_template_fields(cs = %Changeset{}), do: cs
 
   @spec derive_template_fields(t()) :: t()
-  def derive_template_fields(type = %__MODULE__{template_fields: [_ | _]}), do: type
-
   def derive_template_fields(type = %__MODULE__{template: template}) do
     {:ok, fields} = Template.get_fields(template)
     %{type | template_fields: fields}

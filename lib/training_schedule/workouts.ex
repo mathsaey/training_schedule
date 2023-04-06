@@ -9,33 +9,16 @@ defmodule TrainingSchedule.Workouts do
   alias TrainingSchedule.{PubSub, Repo}
 
   alias TrainingSchedule.Accounts.User
-  alias TrainingSchedule.Workouts.{Type, Workout}
+  alias TrainingSchedule.Workouts.{Type, TypeCache, Workout}
 
   def user_types(%User{id: id}), do: user_types(id)
+  def user_types(user_id), do: TypeCache.fetch_user_types(user_id)
 
-  def user_types(user_id) do
-    from(t in Type, where: t.user_id == ^user_id, order_by: t.name)
-    |> Repo.all()
-    |> Enum.map(&Type.derive_template_fields/1)
-  end
+  def type_by_id(%User{id: user_id}, type_id), do: type_by_id(user_id, type_id)
+  def type_by_id(user_id, type_id), do: TypeCache.fetch_type_by_id(user_id, type_id)
 
-  def type_by_id(id) do
-    from(t in Type, where: t.id == ^id)
-    |> Repo.one()
-    |> Type.derive_template_fields()
-  end
-
-  def type_by_name(user_id, name) do
-    from(t in Type, where: t.name == ^name and t.user_id == ^user_id)
-    |> Repo.one()
-    |> Type.derive_template_fields()
-  end
-
-  defp types_by_ids(ids) do
-    from(t in Type, where: t.id in ^ids)
-    |> Repo.all()
-    |> Enum.map(&Type.derive_template_fields/1)
-  end
+  def type_by_name(%User{id: id}, name), do: type_by_name(id, name)
+  def type_by_name(user_id, name), do: TypeCache.fetch_type_by_name(user_id, name)
 
   def type_changeset(type, attrs \\ %{}), do: Type.changeset(type, attrs)
 
@@ -43,42 +26,37 @@ defmodule TrainingSchedule.Workouts do
     type
     |> Type.changeset(attrs)
     |> Repo.insert!()
-    |> then(&maybe_broadcast({:ok, &1}, :types, :create))
+    |> then(&after_type_change({:ok, &1}, :create))
   end
 
   def create_type(type \\ %Type{}, attrs) do
     type
     |> Type.changeset(attrs)
     |> Repo.insert()
+    |> after_type_change(:create)
     |> maybe_broadcast(:types, :create)
   end
-
-  def update_type(id, attrs) when is_integer(id), do: id |> type_by_id() |> update_type(attrs)
 
   def update_type(type = %Type{}, attrs) do
     type
     |> Type.changeset(attrs)
     |> Repo.update()
-    |> maybe_broadcast(:types, :update)
+    |> after_type_change(:update)
   end
-
-  def delete_type(id) when is_integer(id), do: id |> type_by_id() |> delete_type()
 
   def delete_type(type = %Type{}) do
     type
     |> Repo.delete()
-    |> maybe_broadcast(:types, :delete)
+    |> after_type_change(:delete)
   end
 
-  def dummy_type(user) do
-    Ecto.build_assoc(
-      user,
-      :workout_types,
-      name: "Workout",
-      color: "#0e7490",
-      temlate: "",
-      template_fields: []
-    )
+  def dummy_type(user, attrs \\ []) do
+    defaults = [name: "Workout", color: "#0e7490", template: "", template_fields: []]
+    attrs = Keyword.merge(defaults, attrs)
+
+    user
+    |> Ecto.build_assoc(:workout_types, attrs)
+    |> Type.derive_template_fields()
   end
 
   def user_workouts(%User{id: id}, from, to), do: user_workouts(id, from, to)
@@ -87,7 +65,7 @@ defmodule TrainingSchedule.Workouts do
     from(
       w in Workout,
       where: w.user_id == ^user_id and ^from <= w.date and w.date <= ^to,
-      preload: [type: ^(&types_by_ids/1)],
+      preload: [:type],
       order_by: w.date
     )
     |> Repo.all()
@@ -110,6 +88,7 @@ defmodule TrainingSchedule.Workouts do
     wo
     |> Workout.changeset(attrs)
     |> Repo.insert!()
+    |> Workout.derive_description()
     |> then(&maybe_broadcast({:ok, &1}, :workouts, :create))
   end
 
@@ -117,6 +96,7 @@ defmodule TrainingSchedule.Workouts do
     wo
     |> Workout.changeset(attrs)
     |> Repo.insert()
+    |> maybe_derive_description()
     |> maybe_broadcast(:workouts, :create)
   end
 
@@ -126,6 +106,7 @@ defmodule TrainingSchedule.Workouts do
     wo
     |> Workout.changeset(attrs)
     |> Repo.update()
+    |> maybe_derive_description()
     |> maybe_broadcast(:workouts, :update)
   end
 
@@ -137,7 +118,29 @@ defmodule TrainingSchedule.Workouts do
     |> maybe_broadcast(:workouts, :delete)
   end
 
-  def dummy(user), do: Ecto.build_assoc(user, :workouts, type: dummy_type(user))
+  def dummy(user, attrs \\ []) do
+    attrs = Keyword.put_new_lazy(attrs, :type, fn -> dummy_type(user) end)
+
+    user
+    |> Ecto.build_assoc(:workouts, attrs)
+    |> Workout.derive_description()
+  end
+
+  defp maybe_derive_description({:ok, workout}), do: {:ok, Workout.derive_description(workout)}
+  defp maybe_derive_description(t = {:error, _}), do: t
+
+  defp after_type_change(tup, action) do
+    tup
+    |> maybe_invalidate_type_cache()
+    |> maybe_broadcast(:types, action)
+  end
+
+  defp maybe_invalidate_type_cache(t = {:error, _}), do: t
+
+  defp maybe_invalidate_type_cache(t = {:ok, %Type{user_id: user_id}}) do
+    TypeCache.invalidate(user_id)
+    t
+  end
 
   defp maybe_broadcast(t = {:error, _}, _, _), do: t
 

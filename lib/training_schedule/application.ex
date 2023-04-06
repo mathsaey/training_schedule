@@ -1,6 +1,4 @@
 defmodule TrainingSchedule.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -9,6 +7,7 @@ defmodule TrainingSchedule.Application do
   def start(_type, _args) do
     children = [
       TrainingSchedule.Repo,
+      TrainingSchedule.Workouts.TypeCache,
       {Phoenix.PubSub, name: TrainingSchedule.PubSub},
       TrainingScheduleWeb.Endpoint
     ]

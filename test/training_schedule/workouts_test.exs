@@ -127,19 +127,16 @@ defmodule TrainingSchedule.WorkoutsTest do
       [type1: t1, type2: t2]
     end
 
+    test "does not exist", %{user: user} do
+      assert Workouts.type_by_id(user, -1) == nil
+      assert Workouts.type_by_name(user, "does not exist") == nil
+    end
+
     test "retrieval", %{user: user, type1: t1, type2: t2} do
       ids = user |> Workouts.user_types() |> Enum.map(& &1.id)
-      assert t1.id in ids
-      assert t2.id in ids
+      assert ids == [t1.id, t2.id]
 
-      ids = user.id |> Workouts.user_types() |> Enum.map(& &1.id)
-      assert t1.id in ids
-      assert t2.id in ids
-
-      assert Workouts.type_by_id(t1.id).id == t1.id
-      assert Workouts.type_by_id(t2.id).id == t2.id
-
-      assert Workouts.type_by_name(user.id, t1.name).id == t1.id
+      assert Workouts.type_by_id(user.id, t1.id).id == t1.id
       assert Workouts.type_by_name(user.id, t2.name).id == t2.id
     end
 
@@ -149,19 +146,19 @@ defmodule TrainingSchedule.WorkoutsTest do
       |> Enum.all?(&(&1.template_fields == ["reps"]))
       |> assert()
 
-      assert Workouts.type_by_id(t1.id).template_fields == ["reps"]
-      assert Workouts.type_by_id(t2.id).template_fields == ["reps"]
+      assert Workouts.type_by_id(user, t1.id).template_fields == ["reps"]
+      assert Workouts.type_by_id(user, t2.id).template_fields == ["reps"]
 
       assert Workouts.type_by_name(user.id, t1.name).template_fields == ["reps"]
       assert Workouts.type_by_name(user.id, t2.name).template_fields == ["reps"]
     end
 
-    test "update", %{type1: t1, type2: t2} do
+    test "update", %{user: user, type1: t1, type2: t2} do
       {:ok, t1} = Workouts.update_type(t1, %{name: "new name"})
-      {:ok, t2} = Workouts.update_type(t2.id, %{template: "new template"})
+      {:ok, t2} = Workouts.update_type(t2, %{template: "new template"})
 
-      assert Workouts.type_by_id(t1.id).name == "new name"
-      assert Workouts.type_by_id(t2.id).template_fields == []
+      assert Workouts.type_by_id(user.id, t1.id).name == "new name"
+      assert Workouts.type_by_id(user.id, t2.id).template_fields == []
     end
 
     test "update publishes message", %{user: user, type1: type} do
@@ -170,15 +167,12 @@ defmodule TrainingSchedule.WorkoutsTest do
       assert_receive {:types, :update, _type}
     end
 
-    test "deletion", %{type1: t1, type2: t2} do
-      assert Workouts.type_by_id(t1.id).id == t1.id
-      assert Workouts.type_by_id(t2.id).id == t2.id
+    test "deletion", %{user: user, type1: t} do
+      assert Workouts.type_by_id(user.id, t.id).id == t.id
 
-      {:ok, t1} = Workouts.delete_type(t1)
-      {:ok, t2} = Workouts.delete_type(t2.id)
+      {:ok, t} = Workouts.delete_type(t)
 
-      assert Workouts.type_by_id(t1.id) == nil
-      assert Workouts.type_by_id(t2.id) == nil
+      assert Workouts.type_by_id(user.id, t.id) == nil
     end
 
     test "deletion publishes message", %{user: user, type1: type} do

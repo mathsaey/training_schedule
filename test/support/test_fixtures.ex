@@ -22,7 +22,7 @@ defmodule TrainingSchedule.TestFixtures do
         name: "Workout",
         color: "#0e7490",
         template: "{times}x100m",
-        template_fields: ["times"],
+        template_fields: ["times"]
       }
       |> Map.merge(attrs)
 
