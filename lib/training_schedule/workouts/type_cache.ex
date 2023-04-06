@@ -59,6 +59,7 @@ defmodule TrainingSchedule.Workouts.TypeCache do
       [] ->
         GenServer.call(__MODULE__, {:reload, user_id})
         :ets.select(__MODULE__, match_spec)
+
       lst ->
         lst
     end
