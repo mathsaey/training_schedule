@@ -52,9 +52,6 @@ defmodule TrainingScheduleWeb.WorkoutTypeLive.FormComponent do
     |> then(&{:noreply, &1})
   end
 
-  defp type(:new, user) do
-    %{Workouts.dummy_type(user) | template: "{reps}x{distance}@{speed}"}
-  end
-
+  defp type(:new, user), do: Workouts.dummy_type(user, template: "{reps}x{distance}@{speed}")
   defp type(name, user), do: Workouts.type_by_name(user.id, name)
 end

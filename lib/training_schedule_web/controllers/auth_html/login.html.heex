@@ -4,9 +4,9 @@
     for={@conn}
     as={:login}
     action={~p"/login?#{@conn.query_params}"}
-    class="flex flex-col items-center w-5/6 sm:w-96 pb-6 mx-8 my-8 bg-slate-200 dark:bg-slate-600 rounded shadow-md"
+    class="mx-8 my-8 flex w-5/6 flex-col items-center rounded bg-slate-200 pb-6 shadow-md dark:bg-slate-600 sm:w-96"
   >
-    <div class="flex flex-col w-2/3 mt-4">
+    <div class="mt-4 flex w-2/3 flex-col">
       <.input field={{f, :navigate}} type="hidden" value={@navigate} />
       <.input field={{f, :username}} placeholder="Username" class="w-full" type="text" />
       <.input field={{f, :password}} placeholder="Password" class="w-full" type="password" />
