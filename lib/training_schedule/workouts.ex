@@ -96,18 +96,20 @@ defmodule TrainingSchedule.Workouts do
   @spec get(integer()) :: Workout.t() | nil
   def get(id) do
     case Repo.one(from(w in Workout, where: w.id == ^id)) do
-      w = %Workout{user_id: user_id, type_id: type_id} ->
-        type = type_by_id(user_id, type_id)
-        %{w | type: type}
-
-      nil ->
-        nil
+      nil -> nil
+      w -> load_workout_fields(w)
     end
-    |> Workout.derive_description()
   end
 
   @spec changeset(Workout.t(), %{String.t() => any()} | %{atom() => any()}) :: Changeset.t()
   def changeset(workout, attrs \\ %{}), do: Workout.changeset(workout, attrs)
+
+  @spec apply_changes(Changeset.t()) :: Workout.t()
+  def apply_changes(changeset) do
+    changeset
+    |> Changeset.apply_changes()
+    |> load_workout_fields()
+  end
 
   @spec duplicate(Workout.t() | integer()) :: Workout.t()
   def duplicate(workout = %Workout{}), do: Workout.duplicate(workout)
@@ -116,13 +118,8 @@ defmodule TrainingSchedule.Workouts do
   @spec create!(Workout.t(), %{String.t() => any()} | %{atom() => any()}) ::
           Workout.t() | no_return()
   def create!(wo \\ %Workout{}, attrs) do
-    workout = wo |> Workout.changeset(attrs) |> Repo.insert!()
-
-    {:ok, workout} =
-      {:ok, workout}
-      |> maybe_load_virtuals()
-      |> maybe_broadcast(:workouts, :create)
-
+    workout = wo |> Workout.changeset(attrs) |> Repo.insert!() |> load_workout_fields()
+    maybe_broadcast({:ok, workout}, :workouts, :create)
     workout
   end
 
@@ -132,7 +129,7 @@ defmodule TrainingSchedule.Workouts do
     wo
     |> Workout.changeset(attrs)
     |> Repo.insert()
-    |> maybe_load_virtuals()
+    |> maybe_load_workout_fields()
     |> maybe_broadcast(:workouts, :create)
   end
 
@@ -144,7 +141,7 @@ defmodule TrainingSchedule.Workouts do
     wo
     |> Workout.changeset(attrs)
     |> Repo.update()
-    |> maybe_load_virtuals()
+    |> maybe_load_workout_fields()
     |> maybe_broadcast(:workouts, :update)
   end
 
@@ -171,11 +168,12 @@ defmodule TrainingSchedule.Workouts do
     |> Workout.derive_description()
   end
 
-  defp maybe_load_virtuals({:ok, workout = %Workout{user_id: user_id, type_id: type_id}}) do
-    {:ok, Workout.derive_description(%{workout | type: type_by_id(user_id, type_id)})}
-  end
+  defp maybe_load_workout_fields({:ok, workout}), do: {:ok, load_workout_fields(workout)}
+  defp maybe_load_workout_fields(t = {:error, _}), do: t
 
-  defp maybe_load_virtuals(t = {:error, _}), do: t
+  defp load_workout_fields(workout = %Workout{user_id: user_id, type_id: type_id}) do
+    Workout.derive_description(%{workout | type: type_by_id(user_id, type_id)})
+  end
 
   defp after_type_change(tup, action) do
     tup

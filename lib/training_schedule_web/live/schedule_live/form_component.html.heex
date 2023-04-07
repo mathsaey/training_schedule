@@ -2,7 +2,7 @@
   <.workout_form_modal id="schedule_workout_popup" return={~p"/from/#{@from}/to/#{@to}"}>
     <:preview>
       <div class="flex flex-col items-center">
-        <.workout_card type={@type} distance={@preview.distance}>
+        <.workout_card type={@preview.type} distance={@preview.distance}>
           <%= @preview.description %>
         </.workout_card>
         <%= Calendar.strftime(@date, "%A, %B %d") %>
@@ -33,12 +33,12 @@
           type="select"
           label="Workout Type"
           prompt=""
-          options={Enum.map(@types, &{&1.name, &1.id})}
+          options={@type_options}
         />
-        <.input field={{f, :distance}} type="number" step="any" min="0" label="Distance" />
+        <.input field={{f, :distance}} type="number" step="1" min="0" label="Distance" />
         <.input field={{f, :date}} value={@date} type="hidden" />
 
-        <.description_field_inputs form={f} type={@type} />
+        <.description_field_inputs form={f} type={@preview.type} />
       </div>
 
       <div class="flex items-center justify-center">

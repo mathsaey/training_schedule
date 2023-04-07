@@ -1,22 +1,19 @@
 defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
   use TrainingScheduleWeb, :live_component
   alias TrainingSchedule.Workouts
-  alias Ecto.Changeset
 
   @impl true
   def update(assigns, socket) do
     workout = workout(assigns.id, assigns)
-    types = Workouts.user_types(assigns.user)
+    type_options = assigns.user |> Workouts.user_types() |> Enum.map(&{&1.name, &1.id})
 
     {:ok,
      socket
-     |> assign(assigns)
-     |> assign(:type, workout.type)
-     |> assign(:types, types)
      |> assign(:preview, workout)
      |> assign(:workout, workout)
+     |> assign(:type_options, type_options)
      |> assign(:changeset, Workouts.changeset(workout))
-     |> assign(:dummy_type, Workouts.dummy_type(assigns.user))}
+     |> assign(Map.take(assigns, [:from, :to, :date, :action, :user]))}
   end
 
   defp workout(:new, assigns), do: Workouts.dummy(assigns.user)
@@ -29,24 +26,16 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
       |> Workouts.changeset(params)
       |> Map.replace!(:action, :validate)
 
-    # Avoid repetitive querying to generate the preview, search in the preloaded list of types
-    type_id = Changeset.fetch_field!(changeset, :type_id)
-    type = Enum.find(socket.assigns.types, socket.assigns.dummy_type, &(&1.id == type_id))
-    preview = %{Changeset.apply_changes(changeset) | type: type}
-
     {:noreply,
      socket
-     |> assign(:type, type)
-     |> assign(:preview, preview)
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, changeset)
+     |> assign(:preview, Workouts.apply_changes(changeset))}
   end
 
   def handle_event("save", %{"workout" => params}, socket) do
-    workout = Map.put(socket.assigns.workout, :type, nil)
-
     case socket.assigns.action do
-      :new -> Workouts.create(workout, params)
-      :edit -> Workouts.update(workout, params)
+      :new -> Workouts.create(socket.assigns.workout, params)
+      :edit -> Workouts.update(socket.assigns.workout, params)
     end
     |> case do
       {:ok, _} -> after_update(socket)
@@ -61,9 +50,12 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
   end
 
   def after_update(socket) do
-    {:noreply, push_patch(socket, to: ~p"/from/#{socket.assigns.from}/to/#{socket.assigns.to}", replace: true)}
+    {:noreply,
+     push_patch(socket,
+       to: ~p"/from/#{socket.assigns.from}/to/#{socket.assigns.to}",
+       replace: true
+     )}
   end
-
 
   attr :form, :any, required: true
   attr :type, :any, required: true
