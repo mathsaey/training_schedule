@@ -28,6 +28,17 @@ jobs:
       - uses: ./.github/actions/mix-setup
       - run: mix format --check-formatted
 
+  compile-tests:
+    name: compiler output including tests
+    runs-on: ubuntu-latest
+    needs: compile
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/mix-setup
+        with:
+          cache-prefix: test
+      - run: MIX_ENV=test mix compile --all-warnings --warnings-as-errors
+
   test:
     name: tests
     runs-on: ubuntu-latest
