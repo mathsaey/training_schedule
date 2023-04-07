@@ -5,26 +5,6 @@ defmodule TrainingSchedule.Workouts.TypeCache do
   This module implements a GenServer which maintains an ets table. This table maintains a cache of
   all workout types associated with a user. This is done to avoid repetitively querying the
   database for workout types, which tend not to change often.
-
-  ## Edge cases & Assumptions
-
-  When data is fetched from an ets table, we cannot distinguish between the case where there are
-  no types for a user and between the case where the types for a user where not cached yet. We
-  therefore always load the types of a user in the cache when we encounter a cache miss. This is
-  done for the following reasons:
-
-  * Users without workout types should be a rare occurrence. Moreover, fetching a type by name or
-  id should be done with a valid name or id most of the time. Therefore, an empty return list
-  will correspond to a cache miss most of the time.
-
-  * Cache misses should be relatively infrequent (they should only occur once, when we fetch the
-  types of a user for the first time), we therefore write our code for the common case.
-
-  * The alternative, where a dummy value is stored in the cache for users without workout types,
-  could cause memory leaks if an attacker manages to query the cache for non-existent user ids.
-
-  Finally, we reload the types of a user when they are updated in any way. This is done under the
-  assumption that types will be loaded soon after they are updated.
   """
   use GenServer
   import Ecto.Query
@@ -34,10 +14,40 @@ defmodule TrainingSchedule.Workouts.TypeCache do
 
   def start_link([]), do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
 
+  @doc """
+  Invalidate the cache entries associated with `user_id`.
+
+  All entries of the user present in the cache are purged, after which they are reloaded. This is
+  done under the assumption data for "active" users will be fetched soon after editing.
+
+  This operation always needs to synchronise with the cache server, which queries the database to
+  reload the types for the provided `user_id`.
+  """
+  @spec invalidate(integer()) :: :ok
   def invalidate(user_id), do: GenServer.call(__MODULE__, {:reload, user_id})
 
+  @doc """
+  Fetch all the types associated with `user_id`.
+
+  Attempt to fetch the types for a user from the cache, load them into the cache from the database
+  and fetch them afterwards if they are currently not loaded.
+
+  If no records for the user are present in the database, this operation synchronises with the
+  cache server, which will query the database. This is done under the assumption users with no
+  existing types are a rare occurrence.
+  """
+  @spec fetch_user_types(integer()) :: [Type.t()]
   def fetch_user_types(user_id), do: select_load_if_empty(user_id, %{})
 
+  @doc """
+  Fetch the type with `id` associated with `user_id`.
+
+  Attempt to fetch the type with `id` from the cache. If no entry is present, the operation
+  synchronises with the cache server, which will query the database. This is done under the
+  assumption a cache miss occurs because the type is not loaded yet. Said otherwise, this
+  operation assumes that queries to non-existent ids are infrequent.
+  """
+  @spec fetch_type_by_id(integer(), integer()) :: Type.t() | nil
   def fetch_type_by_id(user_id, id) do
     case select_load_if_empty(user_id, %{id: id}) do
       [] -> nil
@@ -45,6 +55,15 @@ defmodule TrainingSchedule.Workouts.TypeCache do
     end
   end
 
+  @doc """
+  Fetch the type with name `name` associated with `user_id`.
+
+  Attempt to fetch the type with name `name` from the cache. If no entry is present, the operation
+  synchronises with the cache server, which will query the database. This is done under the
+  assumption a cache miss occurs because the type is not loaded yet. Said otherwise, this
+  operation assumes that queries to non-existent names are infrequent.
+  """
+  @spec fetch_type_by_name(integer(), String.t()) :: Type.t() | nil
   def fetch_type_by_name(user_id, name) do
     case select_load_if_empty(user_id, %{name: name}) do
       [] -> nil
