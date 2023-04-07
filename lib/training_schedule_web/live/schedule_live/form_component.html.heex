@@ -2,9 +2,9 @@
   <.workout_form_modal id="schedule_workout_popup" return={~p"/from/#{@from}/to/#{@to}"}>
     <:preview>
       <div class="flex flex-col items-center">
-        <.workout_card type={@preview.type} distance={@preview.distance}>
+        <WorkoutComponents.card type={@preview.type} distance={@preview.distance}>
           <%= @preview.description %>
-        </.workout_card>
+        </WorkoutComponents.card>
         <%= Calendar.strftime(@date, "%A, %B %d") %>
       </div>
     </:preview>

@@ -1,9 +1,9 @@
 <div>
   <.workout_form_modal id="workout_type_form_popup" return={~p"/types"}>
     <:preview>
-      <.workout_card type={@preview}>
+      <WorkoutComponents.card type={@preview}>
         <%= @preview.template %>
-      </.workout_card>
+      </WorkoutComponents.card>
     </:preview>
     <:preview_action>
       <.link

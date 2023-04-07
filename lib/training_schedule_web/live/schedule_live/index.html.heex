@@ -12,7 +12,7 @@
   </div>
 </div>
 
-<div class="hidden w-full grid-cols-schedule xl:grid">
+<div class="grid-cols-schedule hidden w-full xl:grid">
   <div class={cell_border()}></div>
   <div
     :for={day <- ~w(Mon Tue Wed Thu Fri Sat Sun)}
@@ -30,13 +30,17 @@
   <%= for week <- @content do %>
     <div class={["hidden xl:flex flex-col items-center justify-center p-4", cell_border()]}>
       <p title="Total distance">
-        <.distance distance={week.total_distance} class="font-normal" />
+        <WorkoutComponents.distance distance={week.total_distance} class="font-normal" />
       </p>
-      <p :if={pct = get_in(week, [:compare_prev, :total_distance_diff_pct])} class="flex flex-row items-center font-extralight py-2" title="Difference with last week's distance">
+      <p
+        :if={pct = get_in(week, [:compare_prev, :total_distance_diff_pct])}
+        class="flex flex-row items-center py-2 font-extralight"
+        title="Difference with last week's distance"
+      >
         <%= if pct > 0 do %>
-          <Heroicons.arrow_up mini class="h-4 text-green-400"/>
+          <Heroicons.arrow_up mini class="h-4 text-green-400" />
         <% else %>
-          <Heroicons.arrow_down mini class="h-4 text-red-400"/>
+          <Heroicons.arrow_down mini class="h-4 text-red-400" />
         <% end %>
         <%= abs(pct) %>%
       </p>
@@ -54,7 +58,7 @@
             class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
           />
         </.link>
-        <p class="xl:hidden font-thin text-gray-600 dark:text-gray-400">
+        <p class="font-thin text-gray-600 dark:text-gray-400 xl:hidden">
           <%= Calendar.strftime(date, "%a") %>
         </p>
         <p class="w-14 text-right font-thin text-gray-600 dark:text-gray-400">
@@ -66,7 +70,7 @@
           <% end %>
         </p>
       </div>
-      <.workout_card
+      <WorkoutComponents.card
         :for={workout <- workouts}
         id={"workout_#{workout.id}"}
         type={workout.type}
@@ -76,10 +80,10 @@
         replace
       >
         <%= workout.description %>
-      </.workout_card>
+      </WorkoutComponents.card>
     </div>
   <% end %>
-  <div :for={_ <- @empty_after}/>
+  <div :for={_ <- @empty_after} />
 </div>
 
 <%= case @live_action do %>

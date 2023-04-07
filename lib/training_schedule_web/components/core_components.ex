@@ -13,54 +13,6 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   alias Phoenix.LiveView.JS
 
-  attr :unit, :string, default: "km"
-  attr :distance, :float, required: true
-  attr :class, :string, default: nil
-
-  def distance(assigns) do
-    ~H"""
-    <span class={["break-words font-light", @class]}>
-      <%= format_distance(@distance) %> <%= @unit %>
-    </span>
-    """
-  end
-
-  defp format_distance(distance) when round(distance) == distance, do: round(distance)
-  defp format_distance(distance), do: distance
-
-  attr :id, :string, default: nil
-  attr :action, :string, default: nil
-  attr :distance, :float, default: nil
-  attr :type, TrainingSchedule.Workouts.Type, required: true
-  attr :rest, :global, include: ~w(draggable replace)
-  slot :inner_block, required: true
-
-  def workout_card(%{action: nil} = assigns) do
-    ~H"""
-    <div class={workout_card_shared()} id={@id} style={"background-color:#{@type.color}"} {@rest}>
-      <p class={workout_card_title()}><%= @type.name %></p>
-      <p class={workout_card_content()}><%= render_slot(@inner_block) %></p>
-      <p :if={@distance}><.distance distance={@distance}/></p>
-    </div>
-    """
-  end
-
-  def workout_card(assigns) do
-    ~H"""
-    <.link id={@id} patch={@action} {@rest}>
-      <div class={[workout_card_shared(), "hover:ring-4"]} style={"background-color:#{@type.color}"}>
-        <p class="break-words font-bold"><%= @type.name %></p>
-        <p class="break-words font-light"><%= render_slot(@inner_block) %></p>
-        <p :if={@distance}><.distance distance={@distance}/></p>
-      </div>
-    </.link>
-    """
-  end
-
-  defp workout_card_shared, do: "space-y-1p flex w-48 flex-col rounded p-4 m-2 text-center"
-  defp workout_card_title, do: "break-words font-bold"
-  defp workout_card_content, do: "break-words font-light"
-
   attr :id, :string, required: true
   attr :return, :string, required: true
 
@@ -140,7 +92,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def inline_code(assigns) do
     ~H"""
-    <code class="px-1 bg-zinc-400 font-mono border">
+    <code class="font-mono border bg-zinc-400 px-1">
       <%= render_slot(@inner_block) %>
     </code>
     """
@@ -288,7 +240,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
         {@rest}
       />
       <.error :for={msg <- @errors} phx-feedback-for={@name}><%= msg %></.error>
-      <p :if={@description != []} class="pt-2 font-serif font-light text-justify">
+      <p :if={@description != []} class="font-serif pt-2 text-justify font-light">
         <%= render_slot(@description) %>
       </p>
     </div>

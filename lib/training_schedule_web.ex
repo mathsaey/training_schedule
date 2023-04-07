@@ -84,6 +84,7 @@ defmodule TrainingScheduleWeb do
       use Phoenix.HTML
       # Core UI components and translation
       import TrainingScheduleWeb.CoreComponents
+      alias TrainingScheduleWeb.Components.WorkoutComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
