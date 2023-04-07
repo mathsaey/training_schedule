@@ -5,29 +5,41 @@ defmodule TrainingSchedule.Workouts do
   This context groups most of the functionality related to workouts.
   """
   import Ecto.Query, except: [update: 2]
-  alias TrainingSchedule.{PubSub, Repo}
+  alias Ecto.Changeset
 
   alias TrainingSchedule.Accounts.User
+  alias TrainingSchedule.{PubSub, Repo}
   alias TrainingSchedule.Workouts.{Type, TypeCache, Workout}
 
+  @spec user_types(integer() | User.t()) :: [Type.t()]
   def user_types(%User{id: id}), do: user_types(id)
   def user_types(user_id), do: TypeCache.fetch_user_types(user_id)
 
+  @spec type_by_id(integer() | User.t(), integer()) :: Type.t() | nil
   def type_by_id(%User{id: user_id}, type_id), do: type_by_id(user_id, type_id)
   def type_by_id(user_id, type_id), do: TypeCache.fetch_type_by_id(user_id, type_id)
 
+  @spec type_by_name(integer() | User.t(), String.t()) :: Type.t() | nil
   def type_by_name(%User{id: id}, name), do: type_by_name(id, name)
   def type_by_name(user_id, name), do: TypeCache.fetch_type_by_name(user_id, name)
 
+  @spec type_changeset(Type.t(), %{String.t() => any()} | %{atom() => any()}) :: Changeset.t()
   def type_changeset(type, attrs \\ %{}), do: Type.changeset(type, attrs)
 
+  @spec create_type!(Type.t(), %{String.t() => any()} | %{atom() => any()}) ::
+          Type.t() | no_return()
   def create_type!(type \\ %Type{}, attrs) do
+    type =
+      type
+      |> Type.changeset(attrs)
+      |> Repo.insert!()
+
+    after_type_change({:ok, type}, :create)
     type
-    |> Type.changeset(attrs)
-    |> Repo.insert!()
-    |> then(&after_type_change({:ok, &1}, :create))
   end
 
+  @spec create_type(Type.t(), %{String.t() => any()} | %{atom() => any()}) ::
+          {:ok, Type.t()} | {:error, Changeset.t()}
   def create_type(type \\ %Type{}, attrs) do
     type
     |> Type.changeset(attrs)
@@ -36,6 +48,8 @@ defmodule TrainingSchedule.Workouts do
     |> maybe_broadcast(:types, :create)
   end
 
+  @spec update_type(Type.t(), %{String.t() => any()} | %{atom() => any()}) ::
+          {:ok, Type.t()} | {:error, Changeset.t()}
   def update_type(type = %Type{}, attrs) do
     type
     |> Type.changeset(attrs)
@@ -43,12 +57,19 @@ defmodule TrainingSchedule.Workouts do
     |> after_type_change(:update)
   end
 
+  @spec delete_type(Type.t()) :: {:ok, Type.t()} | {:error, Changeset.t()}
   def delete_type(type = %Type{}) do
     type
     |> Repo.delete()
     |> after_type_change(:delete)
   end
 
+  @doc """
+  Create a dummy placeholder type.
+
+  Creates a dummy type, which can be used as a placeholder in a preview or form.
+  """
+  @spec dummy_type(User.t(), keyword()) :: Type.t()
   def dummy_type(user, attrs \\ []) do
     defaults = [name: "Workout", color: "#0e7490", template: "", template_fields: []]
     attrs = Keyword.merge(defaults, attrs)
@@ -58,6 +79,7 @@ defmodule TrainingSchedule.Workouts do
     |> Type.derive_template_fields()
   end
 
+  @spec user_workouts(User.t() | integer(), Date.t(), Date.t()) :: [Workout.t()]
   def user_workouts(%User{id: id}, from, to), do: user_workouts(id, from, to)
 
   def user_workouts(user_id, from, to) when is_integer(user_id) do
@@ -71,44 +93,62 @@ defmodule TrainingSchedule.Workouts do
     |> Enum.map(&Workout.derive_description/1)
   end
 
+  @spec get(integer()) :: Workout.t() | nil
   def get(id) do
-    from(w in Workout, where: w.id == ^id, preload: [:type])
-    |> Repo.one()
+    case Repo.one(from(w in Workout, where: w.id == ^id)) do
+      w = %Workout{user_id: user_id, type_id: type_id} ->
+        type = type_by_id(user_id, type_id)
+        %{w | type: type}
+
+      nil ->
+        nil
+    end
     |> Workout.derive_description()
-    |> Map.update!(:type, &Type.derive_template_fields/1)
   end
 
+  @spec changeset(Workout.t(), %{String.t() => any()} | %{atom() => any()}) :: Changeset.t()
   def changeset(workout, attrs \\ %{}), do: Workout.changeset(workout, attrs)
 
+  @spec duplicate(Workout.t() | integer()) :: Workout.t()
   def duplicate(workout = %Workout{}), do: Workout.duplicate(workout)
   def duplicate(id), do: id |> get() |> Workout.duplicate()
 
+  @spec create!(Workout.t(), %{String.t() => any()} | %{atom() => any()}) ::
+          Workout.t() | no_return()
   def create!(wo \\ %Workout{}, attrs) do
-    wo
-    |> Workout.changeset(attrs)
-    |> Repo.insert!()
-    |> Workout.derive_description()
-    |> then(&maybe_broadcast({:ok, &1}, :workouts, :create))
+    workout = wo |> Workout.changeset(attrs) |> Repo.insert!()
+
+    {:ok, workout} =
+      {:ok, workout}
+      |> maybe_load_virtuals()
+      |> maybe_broadcast(:workouts, :create)
+
+    workout
   end
 
+  @spec create(Workout.t(), %{String.t() => any()} | %{atom() => any()}) ::
+          {:ok, Workout.t()} | {:error, Changeset.t()}
   def create(wo \\ %Workout{}, attrs) do
     wo
     |> Workout.changeset(attrs)
     |> Repo.insert()
-    |> maybe_derive_description()
+    |> maybe_load_virtuals()
     |> maybe_broadcast(:workouts, :create)
   end
 
+  @spec update(Workout.t() | integer(), %{String.t() => any()} | %{atom() => any()}) ::
+          {:ok, Workout.t()} | {:error, Changeset.t()}
   def update(id, attrs) when is_integer(id), do: id |> get() |> update(attrs)
 
   def update(wo = %Workout{}, attrs) do
     wo
     |> Workout.changeset(attrs)
     |> Repo.update()
-    |> maybe_derive_description()
+    |> maybe_load_virtuals()
     |> maybe_broadcast(:workouts, :update)
   end
 
+  @spec delete(Workout.t() | integer()) :: {:ok, Workout.t()} | {:error, Changeset.t()}
   def delete(id) when is_integer(id), do: id |> get() |> Repo.delete()
 
   def delete(workout = %Workout{}) do
@@ -117,6 +157,12 @@ defmodule TrainingSchedule.Workouts do
     |> maybe_broadcast(:workouts, :delete)
   end
 
+  @doc """
+  Create dummy workout.
+
+  Create a dummy workout. Useful as a placeholder in a preview or form.
+  """
+  @spec dummy(User.t(), keyword()) :: Workout.t()
   def dummy(user, attrs \\ []) do
     attrs = Keyword.put_new_lazy(attrs, :type, fn -> dummy_type(user) end)
 
@@ -125,8 +171,11 @@ defmodule TrainingSchedule.Workouts do
     |> Workout.derive_description()
   end
 
-  defp maybe_derive_description({:ok, workout}), do: {:ok, Workout.derive_description(workout)}
-  defp maybe_derive_description(t = {:error, _}), do: t
+  defp maybe_load_virtuals({:ok, workout = %Workout{user_id: user_id, type_id: type_id}}) do
+    {:ok, Workout.derive_description(%{workout | type: type_by_id(user_id, type_id)})}
+  end
+
+  defp maybe_load_virtuals(t = {:error, _}), do: t
 
   defp after_type_change(tup, action) do
     tup

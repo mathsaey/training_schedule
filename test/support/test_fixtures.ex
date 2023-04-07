@@ -17,15 +17,15 @@ defmodule TrainingSchedule.TestFixtures do
   end
 
   def type_fixture(user \\ user_fixture(), attrs \\ %{}) do
-    attrs =
-      %{
-        name: "Workout",
-        color: "#0e7490",
-        template: "{times}x100m",
-        template_fields: ["times"]
-      }
-      |> Map.merge(attrs)
-
-    Ecto.build_assoc(user, :workout_types, attrs)
+    %{
+      user_id: user.id,
+      user: user,
+      name: "Workout",
+      color: "#0e7490",
+      template: "{times}x100m",
+      template_fields: ["times"]
+    }
+    |> Map.merge(attrs)
+    |> TrainingSchedule.Workouts.create_type!()
   end
 end
