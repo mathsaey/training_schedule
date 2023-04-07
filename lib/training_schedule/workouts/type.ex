@@ -18,7 +18,7 @@ defmodule TrainingSchedule.Workouts.Type do
   This struct represents a workout type.
 
   Care should be taken to ensure the `:template_fields` of this struct remains consistent with its
-  `:template`. The `changeset/2` function ensure this happens automatically (if the changeset is
+  `:template`. The `changeset/2` function ensures this happens automatically (if the changeset is
   valid). When a workout is fetched from the database, `derive_template_fields/1` should be used
   to ensure the template fields are stored inside the struct.
   """
