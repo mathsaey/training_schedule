@@ -33,7 +33,7 @@
         <WorkoutComponents.distance distance={week.total_distance} class="font-normal" />
       </p>
       <p
-        :if={pct = get_in(week, [:compare_prev, :total_distance_diff_pct])}
+        :if={pct = week.compare_prev[:distance_diff_pct]}
         class="flex flex-row items-center py-2 font-extralight"
         title="Difference with last week's distance"
       >
@@ -42,7 +42,7 @@
         <% else %>
           <Heroicons.arrow_down mini class="h-4 text-red-400" />
         <% end %>
-        <%= abs(pct) %>%
+        <%= abs(round(pct)) %>%
       </p>
     </div>
     <div

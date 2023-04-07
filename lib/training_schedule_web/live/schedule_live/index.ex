@@ -1,6 +1,7 @@
 defmodule TrainingScheduleWeb.ScheduleLive.Index do
   use TrainingScheduleWeb, :live_view
 
+  alias TrainingSchedule.Cycles
   alias TrainingSchedule.Workouts
   alias TrainingSchedule.Accounts.User
   alias TrainingScheduleWeb.Endpoint
@@ -111,40 +112,15 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   end
 
   defp group_content(socket) do
-    dates = Enum.chunk_by(socket.assigns.dates, &Date.beginning_of_week/1)
-    workouts = Enum.group_by(socket.assigns.workouts, & &1.date)
-
     content =
-      dates
-      |> Enum.map(fn lst -> Enum.map(lst, &{&1, Map.get(workouts, &1, [])}) end)
-      |> add_statistics()
+      Cycles.group_workouts(
+        socket.assigns.workouts,
+        socket.assigns.from,
+        socket.assigns.to,
+        7
+      )
 
     assign(socket, :content, content)
-  end
-
-  defp add_statistics(weeks) do
-    weeks
-    |> Enum.map(&%{days: &1})
-    |> Enum.map(&Map.merge(&1, weekly_stats(&1.days)))
-    |> Enum.map_reduce(nil, fn
-      week, nil -> {week, week}
-      week, prev -> {Map.put(week, :compare_prev, compare_prev(week, prev)), week}
-    end)
-    |> elem(0)
-  end
-
-  defp weekly_stats(week) do
-    total = week |> Enum.flat_map(&elem(&1, 1)) |> Enum.map(& &1.distance) |> Enum.sum()
-    %{total_distance: total}
-  end
-
-  defp compare_prev(%{total_distance: t}, %{total_distance: 0}), do: %{total_distance_diff: t}
-
-  defp compare_prev(%{total_distance: week}, %{total_distance: prev}) do
-    %{
-      total_distance_diff: round(week - prev),
-      total_distance_diff_pct: round(100 * ((week - prev) / prev))
-    }
   end
 
   defp noninclusive_date_range(from, to) when from == to, do: []
