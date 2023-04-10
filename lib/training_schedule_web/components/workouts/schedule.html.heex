@@ -40,12 +40,16 @@
       dropable={if @modify_fn, do: "true"}
     >
       <div class="flex w-full justify-between p-2">
-        <.link :if={@modify_fn} patch={@modify_fn.({:create, date})} replace class="w-14">
-          <Heroicons.plus_circle
-            mini
-            class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
-          />
-        </.link>
+        <%= if @modify_fn do %>
+          <.link patch={@modify_fn.({:create, date})} replace class="w-14">
+            <Heroicons.plus_circle
+              mini
+              class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
+            />
+          </.link>
+        <% else %>
+          <div />
+        <% end %>
         <p class="font-thin text-gray-600 dark:text-gray-400 xl:hidden">
           <%= Calendar.strftime(date, "%a") %>
         </p>

@@ -3,7 +3,6 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
 
   alias TrainingSchedule.Cycles
   alias TrainingSchedule.Workouts
-  alias TrainingScheduleWeb.Endpoint
   alias TrainingScheduleWeb.ScheduleLive.FormComponent
 
   @schedule_weeks 10

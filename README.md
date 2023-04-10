@@ -21,11 +21,12 @@ some upcoming features, limited time means they may not land any time soon.
 Under development:
 
 - Multi-account support (Done, with the exception of a UI to add users)
+- Share (parts of) your schedule publicly (Done, with the exception of a UI
+  to create and manager shares)
 
 ### Ideas for future versions
 
 - ical export
-- Share (parts of) your schedule publicly
 - Integrate with strava, garmin connect, … to compare expected / actual mileage.
 - Workout description / notes with markdown support
 - Supplementary workouts (strength / stretches)
