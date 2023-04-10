@@ -1,5 +1,5 @@
-<div class="grid-cols-schedule hidden w-full xl:grid">
-  <div class={schedule_cell_border()}></div>
+<div class="hidden w-full grid-cols-7 lg:grid xl:grid-cols-schedule">
+  <div class={["hidden xl:flex", schedule_cell_border()]}></div>
   <div
     :for={day <- schedule_cycle_days(@cycles)}
     class={["flex justify-center py-2", schedule_cell_border()]}
@@ -9,7 +9,7 @@
 </div>
 <div
   id="workout_schedule"
-  class="grid w-full grid-cols-1 xl:grid-cols-schedule"
+  class="grid w-full grid-cols-1 lg:grid-cols-7 xl:grid-cols-schedule"
   phx-hook={if @modify_fn, do: "WorkoutDragAndDrop"}
 >
   <%= for cycle <- @cycles do %>
@@ -41,19 +41,19 @@
     >
       <div class="flex w-full justify-between p-2">
         <%= if @modify_fn do %>
-          <.link patch={@modify_fn.({:create, date})} replace class="w-14">
+          <.link patch={@modify_fn.({:create, date})} replace>
             <Heroicons.plus_circle
               mini
               class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
             />
           </.link>
         <% else %>
-          <div />
+          <div class="hidden lg:flex" />
         <% end %>
-        <p class="font-thin text-gray-600 dark:text-gray-400 xl:hidden">
+        <p class="font-thin text-gray-600 dark:text-gray-400 lg:hidden">
           <%= Calendar.strftime(date, "%a") %>
         </p>
-        <p class="w-14 text-right font-thin text-gray-600 dark:text-gray-400">
+        <p class="text-right font-thin text-gray-600 dark:text-gray-400">
           <%= case date.day do %>
             <% 1 -> %>
               <span class="font-normal"><%= Calendar.strftime(date, "%b") %></span>&nbsp 1

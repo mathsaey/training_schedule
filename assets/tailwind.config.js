@@ -17,7 +17,7 @@ module.exports = {
     },
     extend: {
       gridTemplateColumns: {
-        'schedule': '160px repeat(7, minmax(0, 1fr))'
+        'schedule': '90px repeat(7, minmax(0, 1fr))'
       }
     },
   },
