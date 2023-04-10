@@ -10,7 +10,12 @@ defmodule TrainingSchedule.Shares do
     |> Repo.insert()
   end
 
-  def get(uuid), do: Repo.one(from s in Share, where: s.id == ^uuid)
+  def get(uuid) do
+    case Ecto.UUID.cast(uuid) do
+      {:ok, uuid} -> Repo.one(from s in Share, where: s.id == ^uuid)
+      :error -> nil
+    end
+  end
 
   def workouts_for(uuid) do
     share = get(uuid)
