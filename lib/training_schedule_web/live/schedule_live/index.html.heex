@@ -26,11 +26,10 @@
   class="grid w-full grid-cols-1 xl:grid-cols-schedule"
   phx-hook="WorkoutDragAndDrop"
 >
-  <div :for={_ <- @empty_before} />
-  <%= for week <- @content do %>
+  <%= for week <- @cycles do %>
     <div class={["hidden xl:flex flex-col items-center justify-center p-4", cell_border()]}>
       <p title="Total distance">
-        <WorkoutComponents.distance distance={week.total_distance} class="font-normal" />
+        <WorkoutComponents.distance distance={week.distance} class="font-normal" />
       </p>
       <p
         :if={pct = week.compare_prev[:distance_diff_pct]}
@@ -83,7 +82,6 @@
       </WorkoutComponents.card>
     </div>
   <% end %>
-  <div :for={_ <- @empty_after} />
 </div>
 
 <%= case @live_action do %>

@@ -33,7 +33,7 @@ defmodule TrainingSchedule.Cycles do
 
     The other fields contain statistics about the microcycle:
 
-    * `:total_distance` contains the total distance of the cycle.
+    * `:distance` contains the total distance of the cycle.
     * `:compare_prev` compares the micro cycle with the previous micro cycle. It is a map with
       two fields. If there is no previous micro cycle, this field is set to `nil`.
       * `:distance_diff`: The difference in distance between the previous cycle and this cycle.
@@ -42,7 +42,7 @@ defmodule TrainingSchedule.Cycles do
     """
     @type t :: %__MODULE__{
             days: [{Date.t(), [Workout.t()]}],
-            total_distance: float(),
+            distance: float(),
             compare_prev:
               %{
                 required(:distance_diff) => float(),
@@ -51,19 +51,19 @@ defmodule TrainingSchedule.Cycles do
               | nil
           }
 
-    defstruct [:days, :compare_prev, total_distance: 0]
+    defstruct [:days, :compare_prev, distance: 0]
   end
 
   @spec group_workouts([Workout.t()], Date.t(), Date.t(), integer()) :: [Micro.t()]
-  def group_workouts(workouts, start, stop, length) do
+  def group_workouts(workouts, from, to, length) do
     workouts = Enum.group_by(workouts, & &1.date)
 
-    Date.range(start, stop, length)
-    |> Enum.map(fn start ->
-      start
-      |> Date.range(Date.add(start, length - 1))
+    Date.range(from, to, length)
+    |> Enum.map(fn from ->
+      from
+      |> Date.range(Date.add(from, length - 1))
       |> Enum.map(&{&1, Map.get(workouts, &1, [])})
-      |> then(&%Micro{days: &1, total_distance: total_distance(&1)})
+      |> then(&%Micro{days: &1, distance: distance(&1)})
     end)
     |> Enum.map_reduce(nil, fn
       micro, nil -> {micro, micro}
@@ -72,13 +72,13 @@ defmodule TrainingSchedule.Cycles do
     |> elem(0)
   end
 
-  defp total_distance(days) do
+  defp distance(days) do
     days |> Enum.flat_map(&elem(&1, 1)) |> Enum.map(& &1.distance) |> Enum.sum()
   end
 
-  defp compare_prev(%{total_distance: t}, %{total_distance: 0}), do: %{distance_diff: t}
+  defp compare_prev(%{distance: t}, %{distance: 0}), do: %{distance_diff: t}
 
-  defp compare_prev(%{total_distance: micro}, %{total_distance: prev}) do
+  defp compare_prev(%{distance: micro}, %{distance: prev}) do
     diff = micro - prev
     %{distance_diff: diff, distance_diff_pct: 100 * (diff / prev)}
   end

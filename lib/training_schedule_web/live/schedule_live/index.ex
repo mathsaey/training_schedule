@@ -3,7 +3,6 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
 
   alias TrainingSchedule.Cycles
   alias TrainingSchedule.Workouts
-  alias TrainingSchedule.Accounts.User
   alias TrainingScheduleWeb.Endpoint
   alias TrainingScheduleWeb.ScheduleLive.FormComponent
 
@@ -14,14 +13,29 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
 
   @impl true
   def mount(_, _, socket) do
-    %User{id: id} = socket.assigns.user
-    if connected?(socket), do: Endpoint.subscribe("workouts:#{id}")
+    if connected?(socket), do: Endpoint.subscribe("workouts:#{socket.assigns.user.id}")
     {:ok, assign(socket, page_title: "Training Schedule")}
   end
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, params(socket, socket.assigns.live_action, params)}
+    Enum.reduce_while(params, %{}, fn
+      {"id", id}, acc ->
+        {:cont, Map.put(acc, "id", id)}
+
+      {k, date}, acc ->
+        case Date.from_iso8601(date) do
+          {:ok, date} -> {:cont, Map.put(acc, k, date)}
+          {:error, _} -> {:halt, false}
+        end
+    end)
+    |> then(fn
+      params when map_size(params) > 0 ->
+        {:noreply, action(socket, socket.assigns.live_action, params)}
+
+      _ ->
+        {:noreply, redirect_to_default_url(socket)}
+    end)
   end
 
   @impl true
@@ -45,21 +59,10 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     {:noreply, load_workouts(socket)}
   end
 
-  defp params(socket, action, params) do
-    Enum.reduce_while(params, %{}, fn
-      {"id", id}, acc ->
-        {:cont, Map.put(acc, "id", id)}
-
-      {k, date}, acc ->
-        case Date.from_iso8601(date) do
-          {:ok, date} -> {:cont, Map.put(acc, k, date)}
-          {:error, _} -> {:halt, false}
-        end
-    end)
-    |> then(fn
-      params when map_size(params) > 0 -> action(socket, action, params)
-      _ -> redirect_to_default_url(socket)
-    end)
+  defp redirect_to_default_url(socket) do
+    from = Date.utc_today() |> Date.beginning_of_week()
+    to = Date.add(from, @schedule_days)
+    push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
   end
 
   defp action(socket, :index, %{"from" => from, "to" => to}) do
@@ -75,12 +78,6 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
 
   defp action(socket, _, _), do: redirect_to_default_url(socket)
 
-  defp redirect_to_default_url(socket) do
-    from = Date.utc_today() |> Date.beginning_of_week()
-    to = Date.add(from, @schedule_days)
-    push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
-  end
-
   defp maybe_load_between(socket, from, to) do
     case Map.take(socket.assigns, [:from, :to]) do
       %{from: ^from, to: ^to} -> socket
@@ -94,37 +91,17 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     |> assign(:from, from)
     |> assign(:back, Date.add(from, -7))
     |> assign(:forward, Date.add(to, 7))
-    |> assign(:dates, Date.range(from, to))
-    # TODO: these fuck up the weekly mileage
-    |> assign(:empty_after, noninclusive_date_range(to, Date.end_of_week(to)))
-    |> assign(:empty_before, noninclusive_date_range(Date.beginning_of_week(from), from))
     |> load_workouts()
   end
 
   defp load_workouts(socket) do
-    workouts =
-      socket.assigns.user.id
-      |> Workouts.user_workouts(socket.assigns.from, socket.assigns.to)
+    %{from: from, to: to, user: user} = socket.assigns
 
-    socket
-    |> assign(:workouts, workouts)
-    |> group_content()
+    user.id
+    |> Workouts.user_workouts(from, to)
+    |> Cycles.group_workouts(Date.beginning_of_week(from), Date.end_of_week(to), 7)
+    |> then(&assign(socket, :cycles, &1))
   end
-
-  defp group_content(socket) do
-    content =
-      Cycles.group_workouts(
-        socket.assigns.workouts,
-        socket.assigns.from,
-        socket.assigns.to,
-        7
-      )
-
-    assign(socket, :content, content)
-  end
-
-  defp noninclusive_date_range(from, to) when from == to, do: []
-  defp noninclusive_date_range(from, to), do: Date.range(from, Date.add(to, -1))
 
   defp cell_border, do: "border border-gray-200 dark:border-gray-600"
 
