@@ -1,0 +1,74 @@
+<div class="grid-cols-schedule hidden w-full xl:grid">
+  <div class={schedule_cell_border()}></div>
+  <div
+    :for={day <- schedule_cycle_days(@cycles)}
+    class={["flex justify-center py-2", schedule_cell_border()]}
+  >
+    <%= day %>
+  </div>
+</div>
+<div
+  id="workout_schedule"
+  class="grid w-full grid-cols-1 xl:grid-cols-schedule"
+  phx-hook={if @modify_fn, do: "WorkoutDragAndDrop"}
+>
+  <%= for cycle <- @cycles do %>
+    <div class={[
+      "hidden xl:flex flex-col items-center justify-center p-4",
+      schedule_cell_border()
+    ]}>
+      <p title="Total distance">
+        <.distance distance={cycle.distance} class="font-normal" />
+      </p>
+      <p
+        :if={pct = cycle.compare_prev[:distance_diff_pct]}
+        class="flex flex-row items-center py-2 font-extralight"
+        title="Difference with last week's distance"
+      >
+        <%= if pct > 0 do %>
+          <Heroicons.arrow_up mini class="h-4 text-green-400" />
+        <% else %>
+          <Heroicons.arrow_down mini class="h-4 text-red-400" />
+        <% end %>
+        <%= abs(round(pct)) %>%
+      </p>
+    </div>
+    <div
+      :for={{date, workouts} <- cycle.days}
+      id={"cell_#{date}"}
+      class={["flex flex-col items-center", schedule_cell_border()]}
+      dropable={if @modify_fn, do: "true"}
+    >
+      <div class="flex w-full justify-between p-2">
+        <.link :if={@modify_fn} patch={@modify_fn.({:create, date})} replace class="w-14">
+          <Heroicons.plus_circle
+            mini
+            class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
+          />
+        </.link>
+        <p class="font-thin text-gray-600 dark:text-gray-400 xl:hidden">
+          <%= Calendar.strftime(date, "%a") %>
+        </p>
+        <p class="w-14 text-right font-thin text-gray-600 dark:text-gray-400">
+          <%= case date.day do %>
+            <% 1 -> %>
+              <span class="font-normal"><%= Calendar.strftime(date, "%b") %></span>&nbsp 1
+            <% day -> %>
+              <%= day %>
+          <% end %>
+        </p>
+      </div>
+      <.card
+        :for={workout <- workouts}
+        id={"workout_#{workout.id}"}
+        type={workout.type}
+        distance={workout.distance}
+        replace
+        draggable={if @modify_fn, do: "true"}
+        action={if @modify_fn, do: @modify_fn.({:edit, workout})}
+      >
+        <%= workout.description %>
+      </.card>
+    </div>
+  <% end %>
+</div>

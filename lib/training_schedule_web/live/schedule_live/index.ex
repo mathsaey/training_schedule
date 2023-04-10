@@ -6,8 +6,6 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   alias TrainingScheduleWeb.Endpoint
   alias TrainingScheduleWeb.ScheduleLive.FormComponent
 
-  # TODO: highlight current week / day
-
   @schedule_weeks 10
   @schedule_days @schedule_weeks * 7 - 1
 
@@ -89,8 +87,8 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     socket
     |> assign(:to, to)
     |> assign(:from, from)
-    |> assign(:back, Date.add(from, -7))
-    |> assign(:forward, Date.add(to, 7))
+    |> assign(:back, from |> Date.beginning_of_week() |> Date.add(-7))
+    |> assign(:forward, to |> Date.end_of_week() |> Date.add(7))
     |> load_workouts()
   end
 
@@ -102,8 +100,6 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     |> Cycles.group_workouts(Date.beginning_of_week(from), Date.end_of_week(to), 7)
     |> then(&assign(socket, :cycles, &1))
   end
-
-  defp cell_border, do: "border border-gray-200 dark:border-gray-600"
 
   attr :rest, :global
   attr :patch, :string, required: true
