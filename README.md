@@ -21,8 +21,8 @@ some upcoming features, limited time means they may not land any time soon.
 Under development:
 
 - Multi-account support (Done, with the exception of a UI to add users)
-- Share (parts of) your schedule publicly (Done, with the exception of a UI
-  to create and manager shares)
+- Share parts of your schedule publicly (Done, with the exception of a UI
+  to create and manage shares)
 
 ### Ideas for future versions
 
@@ -33,6 +33,7 @@ Under development:
 - Export calendar to (customisable) markdown for, e.g., writing race reports
 - Create complete plans which can be added to the calendar with a single click
 - Support for displaying additional information (e.g. focus of the current training block)
+- Time-based planning instead of distance
 
 ## Getting Started
 
@@ -73,6 +74,9 @@ Under development:
   contains a standalone version of the application, you may move it to the
   desired location.
 
+  - Elixir is not required to run the release, but it is recommended to keep it
+    around to build future version of the project.
+
 - From the release folder, you can start the release with:
   `$ ./bin/entrypoint`.
 
@@ -110,6 +114,8 @@ Under development:
 - Start the server: `$ mix phx.server`. You can access it at
   `http://localhost:4000`. There is no need to set any environment variable in
   development.
+
+- `root`/`rootpassword` can be used to log in.
 
 ## Configuration
 
