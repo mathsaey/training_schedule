@@ -142,3 +142,7 @@ Thus, do not expect idiomatic Tailwind or LiveView code here.
 
 Issue reports, feature requests and contributions are always welcome. However,
 do keep in mind that it may take some time for me to get back to you.
+
+# License
+
+GNU Affero General Public License
