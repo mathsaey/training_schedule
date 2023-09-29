@@ -16,6 +16,7 @@
 
 defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   use Phoenix.Component
+  import TrainingScheduleWeb.CoreComponents
 
   embed_templates "workouts/*"
 

@@ -56,9 +56,9 @@
         <p class="text-right font-thin text-gray-600 dark:text-gray-400">
           <%= case date.day do %>
             <% 1 -> %>
-              <span class="font-normal"><%= Calendar.strftime(date, "%b") %></span>&nbsp 1
-            <% day -> %>
-              <%= day %>
+              <.date id={"date_#{date}"} date={date} format="firstDay" class="font-normal"/>
+            <% _ -> %>
+              <.date id={"date_#{date}"} date={date} format="dayOnly" class="font-normal"/>
           <% end %>
         </p>
       </div>
