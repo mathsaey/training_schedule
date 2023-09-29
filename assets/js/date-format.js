@@ -15,11 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const formatOpts = {weekday: 'short', day: 'numeric', month:'short'}
-const formatter = new Intl.DateTimeFormat(undefined, formatOpts)
+const shortFormatOpts = {weekday: 'short', day: 'numeric', month:'short'}
+const longFormatOpts = {dateStyle: 'full'}
+
+const shortFormatter = new Intl.DateTimeFormat(undefined, shortFormatOpts)
+const longFormatter = new Intl.DateTimeFormat(undefined, longFormatOpts)
 
 export default {
   mounted() {
+    let formatter = this.el.hasAttribute("longdate") ? longFormatter : shortFormatter;
     let dt = new Date(this.el.textContent.trim());
     this.el.textContent = formatter.format(dt);
     this.el.classList.remove("invisible");

@@ -115,12 +115,19 @@ defmodule TrainingScheduleWeb.CoreComponents do
   end
 
   attr :id, :string, required: true
-  attr :date, :string, required: true
   attr :class, :string, default: nil
+  attr :date, :string, required: true
+  attr :longdate, :boolean, default: false
 
   def date(assigns) do
     ~H"""
-    <time id={@id} datetime={@date} phx-hook="DateFormat" class={["invisible", @class]}>
+    <time
+      id={@id}
+      datetime={@date}
+      phx-hook="DateFormat"
+      longdate={@longdate}
+      class={["invisible", @class]}
+    >
       <%= @date %>
     </time>
     """
