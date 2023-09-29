@@ -99,6 +99,14 @@ defmodule TrainingScheduleWeb.AuthController do
 
   def on_mount(:default, _params, _, socket), do: {:halt, redirect(socket, to: login_path())}
 
+  @doc """
+  Verify if the current session has a log in token.
+
+  The token is **not** verified.
+
+  This is useful to show or hide non-sensitive information, as it does not need to use the
+  database.
+  """
   def logged_in_token?(conn), do: not is_nil(get_session(conn, :session_token))
 
   @doc """
