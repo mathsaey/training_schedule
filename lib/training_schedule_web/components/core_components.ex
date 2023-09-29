@@ -117,15 +117,15 @@ defmodule TrainingScheduleWeb.CoreComponents do
   attr :id, :string, required: true
   attr :class, :string, default: nil
   attr :date, :string, required: true
-  attr :longdate, :boolean, default: false
+  attr :format, :string, default: "compact"
 
   def date(assigns) do
     ~H"""
     <time
       id={@id}
       datetime={@date}
+      format={@format}
       phx-hook="DateFormat"
-      longdate={@longdate}
       class={["invisible", @class]}
     >
       <%= @date %>

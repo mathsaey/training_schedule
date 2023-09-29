@@ -15,15 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const shortFormatOpts = {weekday: 'short', day: 'numeric', month:'short'}
-const longFormatOpts = {dateStyle: 'full'}
+const formatOpts = {
+  full: {dateStyle: 'full'},
+  monthOnly: {month: 'short'},
+  compact: {weekday: 'short', day: 'numeric', month:'short'}
+}
 
-const shortFormatter = new Intl.DateTimeFormat(undefined, shortFormatOpts)
-const longFormatter = new Intl.DateTimeFormat(undefined, longFormatOpts)
+const formatters = Object.fromEntries(
+  Object.entries(formatOpts).map(
+    ([name, opts]) => [name, new Intl.DateTimeFormat(undefined, opts)]
+  )
+)
 
 export default {
   mounted() {
-    let formatter = this.el.hasAttribute("longdate") ? longFormatter : shortFormatter;
+    let formatter = formatters[this.el.getAttribute("format")];
     let dt = new Date(this.el.textContent.trim());
     this.el.textContent = formatter.format(dt);
     this.el.classList.remove("invisible");
