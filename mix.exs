@@ -47,16 +47,16 @@ defmodule TrainingSchedule.MixProject do
       {:nimble_parsec, "~> 1.3"},
 
       # Webserver / framework
-      {:jason, "~> 1.2"},
+      {:jason, "~> 1.4"},
       {:phoenix, "~> 1.7", override: true},
-      {:plug_cowboy, "~> 2.5"},
-      {:phoenix_html, "~> 3.0"},
+      {:plug_cowboy, "~> 2.6"},
+      {:phoenix_html, "~> 3.3"},
       {:phoenix_ecto, "~> 4.4"},
-      {:phoenix_live_view, "~> 0.18"},
+      {:phoenix_live_view, "~> 0.20"},
 
       # Frontend
       {:heroicons, "~> 0.5"},
-      {:esbuild, "~> 0.6", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
 
       # Database
@@ -64,10 +64,10 @@ defmodule TrainingSchedule.MixProject do
       {:ecto_sqlite3, "~> 0.10"},
 
       # Dev / testing tools
-      {:tailwind_formatter, "~> 0.3.1", only: :dev, runtime: false},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:tailwind_formatter, "~> 0.3", only: :dev, runtime: false},
+      {:phoenix_live_reload, "~> 1.4", only: :dev},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
-      {:sobelow, "~> 0.12", only: :dev, runtime: false},
+      {:sobelow, "~> 0.13", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: :dev, runtime: false},
       {:floki, ">= 0.30.0", only: :test}
     ]
