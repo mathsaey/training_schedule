@@ -21,13 +21,15 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
 import WorkoutDragAndDropHooks from "./workout-drag-drop"
+import DateFormatHooks from "./date-format"
 
 let Hooks = {}
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   params: {_csrf_token: csrfToken},
   hooks: {
-    WorkoutDragAndDrop: WorkoutDragAndDropHooks
+    WorkoutDragAndDrop: WorkoutDragAndDropHooks,
+    DateFormat: DateFormatHooks
   }
 })
 

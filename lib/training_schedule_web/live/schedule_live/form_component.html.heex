@@ -5,7 +5,7 @@
         <WorkoutComponents.card type={@preview.type} distance={@preview.distance}>
           <%= @preview.description %>
         </WorkoutComponents.card>
-        <%= Calendar.strftime(@date, "%A, %B %d") %>
+        <.date date={@date} id="workout-date"></.date>
       </div>
     </:preview>
     <:preview_action>
