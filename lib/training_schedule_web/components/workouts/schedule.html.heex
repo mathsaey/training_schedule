@@ -51,7 +51,7 @@
           <div class="hidden lg:flex" />
         <% end %>
         <p class="font-thin text-gray-600 dark:text-gray-400 lg:hidden">
-          <.date id={"date_#{date}"} date={date} format="weekDayOnly" />
+          <.date id={"weekday_#{date}"} date={date} format="weekDayOnly" />
         </p>
         <p class="text-right font-thin text-gray-600 dark:text-gray-400">
           <%= case date.day do %>
