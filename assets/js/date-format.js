@@ -18,6 +18,7 @@
 const formatOpts = {
   full: {dateStyle: 'full'},
   dayOnly: {day: 'numeric'},
+  weekDayOnly: {weekday: 'short'},
   firstDay: {day: 'numeric', month: 'short'},
   compact: {weekday: 'short', day: 'numeric', month:'short'}
 }
