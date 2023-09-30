@@ -3,10 +3,7 @@
 #   deployment happens. Once things are steady, running on release creation
 #   might be a good candidate.
 name: Create, verify and publish a Docker image on ghcr.io
-on:
-  push:
-    tags:
-      - 'v*'
+on: [push]
 
 env:
   REGISTRY: ghcr.io
