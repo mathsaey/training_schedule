@@ -1,11 +1,13 @@
 <div class="hidden w-full grid-cols-7 lg:grid xl:grid-cols-schedule">
   <div class={["hidden xl:flex", schedule_cell_border()]}></div>
-  <div
+  <.date
     :for={day <- schedule_cycle_days(@cycles)}
-    class={["flex justify-center py-2", schedule_cell_border()]}
-  >
-    <%= day %>
-  </div>
+    id={"weekday_header_#{Date.day_of_week(day)}"}
+    notime
+    date={day}
+    format="weekDayOnly"
+    class={"flex justify-center py-2 invisible #{schedule_cell_border()}"}
+  />
 </div>
 <div
   id="workout_schedule"

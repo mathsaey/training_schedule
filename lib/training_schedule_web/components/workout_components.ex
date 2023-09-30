@@ -81,5 +81,7 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   def schedule(assigns)
 
   defp schedule_cell_border, do: "border border-gray-200 dark:border-gray-600"
-  defp schedule_cycle_days(_), do: ~w(Mon Tue Wed Thu Fri Sat Sun)
+  defp schedule_cycle_days(_) do
+    Date.range(Date.beginning_of_week(Date.utc_today()), Date.end_of_week(Date.utc_today()))
+  end
 end

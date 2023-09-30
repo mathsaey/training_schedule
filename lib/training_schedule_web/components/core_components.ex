@@ -117,7 +117,16 @@ defmodule TrainingScheduleWeb.CoreComponents do
   attr :id, :string, required: true
   attr :class, :string, default: nil
   attr :date, :string, required: true
+  attr :notime, :boolean, default: false
   attr :format, :string, default: "compact"
+
+  def date(%{notime: true} = assigns) do
+    ~H"""
+    <div id={@id} format={@format} phx-hook="DateFormat" class={["invisible", @class]}>
+      <%= @date %>
+    </div>
+    """
+  end
 
   def date(assigns) do
     ~H"""
