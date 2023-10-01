@@ -49,9 +49,10 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
   end
 
   def handle_event("save", %{"workout" => params}, socket) do
+    workout = %{socket.assigns.workout | type: nil}
     case socket.assigns.action do
-      :new -> Workouts.create(socket.assigns.workout, params)
-      :edit -> Workouts.update(socket.assigns.workout, params)
+      :new -> Workouts.create(workout, params)
+      :edit -> Workouts.update(workout, params)
     end
     |> case do
       {:ok, _} -> after_update(socket)
