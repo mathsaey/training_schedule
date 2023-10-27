@@ -49,7 +49,7 @@ defmodule TrainingSchedule.Repo.Migrations.CreateUsersTypesWorkouts do
 
       add :date, :date, null: false
       add :distance, :float, null: false
-      add :description_fields, :map, null: false
+      add :description_fields, :map
     end
 
     create unique_index(:users, [:username])
