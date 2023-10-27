@@ -92,7 +92,7 @@ defmodule TrainingSchedule.Cycles do
     days |> Enum.flat_map(&elem(&1, 1)) |> Enum.map(& &1.distance) |> Enum.sum()
   end
 
-  defp compare_prev(%{distance: t}, %{distance: 0}), do: %{distance_diff: t}
+  defp compare_prev(%{distance: t}, %{distance: d}) when d == 0, do: %{distance_diff: t}
 
   defp compare_prev(%{distance: micro}, %{distance: prev}) do
     diff = micro - prev
