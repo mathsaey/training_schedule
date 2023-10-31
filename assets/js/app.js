@@ -33,6 +33,12 @@ let liveSocket = new LiveSocket("/live", Socket, {
   }
 })
 
+// Paste to clipboard even listener
+window.addEventListener("phx:copy", (event) => {
+  let link = event.target.textContent.trim();
+  navigator.clipboard.writeText(link);
+})
+
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
 window.addEventListener("phx:page-loading-start", info => topbar.delayedShow(200))

@@ -103,7 +103,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
   end
 
   defp button_default_class do
-    "inline-block bg-sky-500 text-slate-100 rounded-md py-2 px-4 mt-4 hover:ring-2"
+    "inline-block bg-sky-500 text-slate-100 rounded-md py-2 px-4 hover:ring-2"
   end
 
   def inline_code(assigns) do
@@ -267,7 +267,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def input(assigns) do
     ~H"""
-    <div class="mb-4">
+    <div>
       <.label for={@id} phx-feedback-for={@name}><%= @label %></.label>
       <input
         type={@type}

@@ -23,6 +23,7 @@ defmodule TrainingScheduleWeb.Layouts do
   defp logged_in_links do
     [
       {"Workout Types", ~p"/types"},
+      {"Shares", ~p"/shares"},
       {"Log out", ~p"/logout"}
     ]
   end

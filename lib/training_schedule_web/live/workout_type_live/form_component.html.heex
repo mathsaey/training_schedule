@@ -25,9 +25,9 @@
       class="flex flex-col justify-between"
     >
       <div class="max-w-md overflow-auto">
-        <.input field={{f, :name}} class="w-full" type="text" label="Name" />
-        <.input field={{f, :color}} class="w-full" type="color" label="Colour" />
-        <.input field={{f, :template}} class="w-full" type="text" label="Template">
+        <.input field={{f, :name}} class="mb-4 w-full" type="text" label="Name" />
+        <.input field={{f, :color}} class="mb-4 w-full" type="color" label="Colour" />
+        <.input field={{f, :template}} class="mb-4 w-full" type="text" label="Template">
           <:description>
             The workout description shown in the schedule is generated based on this template.
             When creating a workout of this type, an input is present for every
@@ -42,7 +42,7 @@
       </div>
 
       <div class="flex items-center justify-center">
-        <.button type="submit">Save</.button>
+        <.button type="submit" class="mt-4">Save</.button>
       </div>
     </.form>
   </.workout_form_modal>

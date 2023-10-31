@@ -17,12 +17,11 @@ some upcoming features, limited time means they may not land any time soon.
 - Plan workouts and display them on a calendar
   - Show weekly mileage
   - Mobile-friendly view on smaller screens
+- Share a read-only version of part of your schedule with a link
 
 Under development:
 
 - Multi-account support (Done, with the exception of a UI to add users)
-- Share parts of your schedule publicly (Done, with the exception of a UI
-  to create and manage shares)
 
 ### Ideas for future versions
 

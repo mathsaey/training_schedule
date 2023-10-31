@@ -16,14 +16,31 @@
 
 defmodule TrainingSchedule.Shares do
   import Ecto.Query
-  alias TrainingSchedule.Repo
-  alias TrainingSchedule.Workouts
-  alias TrainingSchedule.Shares.Share
+  alias TrainingSchedule.{PubSub, Repo, Workouts, Shares.Share, Accounts.User}
 
-  def create(share \\ %Share{}, attrs) do
-    share
+  def create(user_id, attrs) do
+    %Share{user_id: user_id}
     |> Share.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def changeset(share \\ %Share{}, attrs \\ %{}), do: Share.changeset(share, attrs)
+
+  def delete(uuid), do: uuid |> get() |> Repo.delete() |> maybe_broadcast(:delete)
+
+  def safe_delete(uuid, user_id) do
+    share = get(uuid) |> IO.inspect()
+
+    if user_id == share.user_id do
+      share |> Repo.delete() |> maybe_broadcast(:delete)
+    end
+  end
+
+  def update(share, attrs) do
+    share
+    |> Share.changeset(attrs)
+    |> Repo.update()
+    |> maybe_broadcast(:update)
   end
 
   def get(uuid) do
@@ -33,8 +50,18 @@ defmodule TrainingSchedule.Shares do
     end
   end
 
+  def user_shares(%User{id: id}), do: user_shares(id)
+  def user_shares(id), do: Repo.all(from s in Share, where: s.user_id == ^id)
+
   def workouts_for(uuid) do
     share = get(uuid)
     Workouts.user_workouts(share.user_id, share.from, share.to)
+  end
+
+  defp maybe_broadcast(t = {:error, _}, _), do: t
+
+  defp maybe_broadcast(t = {:ok, share}, action) do
+    Phoenix.PubSub.broadcast(PubSub, "shares:#{share.id}", {:shares, action, share})
+    t
   end
 end

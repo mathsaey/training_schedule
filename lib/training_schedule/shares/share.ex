@@ -20,6 +20,7 @@ defmodule TrainingSchedule.Shares.Share do
 
   @primary_key {:id, Ecto.UUID, autogenerate: true}
   schema "shares" do
+    field :name, :string
     field :from, :date
     field :to, :date
 
@@ -30,8 +31,25 @@ defmodule TrainingSchedule.Shares.Share do
 
   def changeset(share, attrs) do
     share
-    |> cast(attrs, [:from, :to, :user_id])
-    |> validate_required([:from, :to, :user_id])
+    |> cast(attrs, [:name, :from, :to, :user_id])
+    |> validate_required([:name, :from, :to, :user_id])
+    |> validate_length(:name, min: 3, max: 255)
+    |> validate_dates()
     |> assoc_constraint(:user)
+  end
+
+  defp validate_dates(changeset) do
+    if changeset.valid? and (changed?(changeset, :from) or changed?(changeset, :to)) do
+      from = fetch_field!(changeset, :from)
+      to = fetch_field!(changeset, :to)
+
+      if Date.compare(to, from) == :gt do
+        changeset
+      else
+        add_error(changeset, :to, "must be after \"from\" date")
+      end
+    else
+      changeset
+    end
   end
 end

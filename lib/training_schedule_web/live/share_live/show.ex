@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-defmodule TrainingScheduleWeb.ShareLive do
+defmodule TrainingScheduleWeb.ShareLive.Show do
   use TrainingScheduleWeb, :live_view
 
   alias TrainingSchedule.Shares
@@ -32,13 +32,30 @@ defmodule TrainingScheduleWeb.ShareLive do
         |> then(&{:ok, &1})
 
       share = %Share{user_id: user_id} ->
-        if connected?(socket), do: Endpoint.subscribe("workouts:#{user_id}")
+        if connected?(socket) do
+          Endpoint.subscribe("workouts:#{user_id}")
+          Endpoint.subscribe("shares:#{id}")
+        end
+
         {:ok, socket |> assign(share: share) |> load_workouts(share)}
     end
   end
 
   @impl true
-  def handle_info(_, socket), do: {:noreply, socket |> load_workouts(socket.assigns.share)}
+  def handle_info({:workouts, _, _}, socket) do
+    {:noreply, socket |> load_workouts(socket.assigns.share)}
+  end
+
+  def handle_info({:shares, :update, share}, socket) do
+    {:noreply, socket |> assign(share: share) |> load_workouts(share)}
+  end
+
+  def handle_info({:shares, :delete, _}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:error, "This share has been deleted")
+     |> redirect(to: ~p"/")}
+  end
 
   defp load_workouts(socket, %Share{user_id: user_id, from: from, to: to}) do
     Workouts.user_workouts(user_id, from, to)
