@@ -51,7 +51,10 @@ defmodule TrainingSchedule.Shares do
   end
 
   def user_shares(%User{id: id}), do: user_shares(id)
-  def user_shares(id), do: Repo.all(from s in Share, where: s.user_id == ^id)
+
+  def user_shares(id) do
+    Repo.all(from s in Share, where: s.user_id == ^id, order_by: [desc: s.to, desc: s.from])
+  end
 
   def workouts_for(uuid) do
     share = get(uuid)
