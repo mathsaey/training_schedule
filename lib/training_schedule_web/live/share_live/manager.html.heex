@@ -11,7 +11,7 @@
   class="pb-12"
   phx-submit={if @edit, do: "update", else: "create"}
 >
-  <div class="flex pb-8">
+  <div class="mb-8 flex">
     <div class="pr-8"><.input field={{f, :name}} label="name" type="text" class="w-64" /></div>
     <div class="pr-4"><.input field={{f, :from}} label="from" type="date" class="w-48" /></div>
     <div class="pr-4"><.input field={{f, :to}} label="to" type="date" class="w-48" /></div>
