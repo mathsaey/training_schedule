@@ -68,7 +68,7 @@ defmodule TrainingScheduleWeb.Layouts do
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
       role="alert"
       class={[
-        "flex justify-between items-center w-5/6 sm:w-1/2 p-2 text-center rounded-md",
+        "flex w-5/6 items-center justify-between rounded-md p-2 text-center sm:w-1/2",
         @kind == :info && "bg-cyan-500 text-cyan-800",
         @kind == :error && "bg-red-500 text-red-900"
       ]}
