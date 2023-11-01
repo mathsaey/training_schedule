@@ -50,12 +50,13 @@ defmodule TrainingSchedule.Accounts.User do
   end
 
   @spec valid_password?(t() | nil, String.t()) :: boolean()
-  def valid_password?(user, password) do
-    match?({:ok, _user}, Argon2.check_pass(user, password))
-  end
+  # Prevent timing attacks: if the user is invalid, we still run the hash function to ensure the
+  # non-existence of the user cannot be inferred.
+  def valid_password?(nil, _), do: Argon2.no_user_verify()
+  def valid_password?(%__MODULE__{password_hash: hash}, pw), do: Argon2.verify_pass(pw, hash)
 
   defp hash(%Ecto.Changeset{valid?: true, changes: %{password: pw}} = cs) do
-    change(cs, Argon2.add_hash(pw))
+    put_change(cs, :password_hash, Argon2.hash_pwd_salt(pw))
   end
 
   defp hash(cs), do: cs
