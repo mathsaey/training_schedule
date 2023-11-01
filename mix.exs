@@ -42,7 +42,7 @@ defmodule TrainingSchedule.MixProject do
   defp deps do
     [
       # Password hashing
-      {:argon2_elixir, "~> 3.1"},
+      {:argon2_elixir, "~> 4.0"},
       # Parsing
       {:nimble_parsec, "~> 1.3"},
 
