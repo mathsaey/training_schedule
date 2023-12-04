@@ -60,7 +60,7 @@ defmodule TrainingSchedule.MixProject do
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
 
       # Database
-      {:ecto_sql, "~> 3.10"},
+      {:ecto_sql, "~> 3.11"},
       {:ecto_sqlite3, "~> 0.12"},
 
       # Dev / testing tools
