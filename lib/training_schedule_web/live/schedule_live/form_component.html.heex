@@ -2,7 +2,11 @@
   <.workout_form_modal id="schedule_workout_popup" return={~p"/from/#{@from}/to/#{@to}"}>
     <:preview>
       <div class="flex flex-col items-center">
-        <WorkoutComponents.card type={@preview.type} distance={@preview.distance}>
+        <WorkoutComponents.card
+          type={@preview.type}
+          distance={@preview.distance}
+          cancelled?={@preview.cancelled?}
+        >
           <%= @preview.description %>
         </WorkoutComponents.card>
         <.date date={@date} id="workout-date" />
@@ -36,9 +40,10 @@
           options={@type_options}
         />
         <.input field={{f, :distance}} type="number" step="any" min="0" label="Distance" />
-        <.input field={{f, :date}} value={@date} type="hidden" />
 
         <.description_field_inputs form={f} type={@preview.type} />
+        <.input field={{f, :cancelled?}} label="Cancelled?" type="checkbox" />
+        <.input field={{f, :date}} value={@date} type="hidden" />
       </div>
 
       <div class="flex items-center justify-center">

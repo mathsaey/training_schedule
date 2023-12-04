@@ -69,6 +69,7 @@
         id={"workout_#{workout.id}"}
         type={workout.type}
         distance={workout.distance}
+        cancelled?={workout.cancelled?}
         replace
         draggable={if @modify_fn, do: "true"}
         action={if @modify_fn, do: @modify_fn.({:edit, workout})}

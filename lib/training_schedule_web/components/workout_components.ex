@@ -38,6 +38,7 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   attr :id, :string, default: nil
   attr :action, :string, default: nil
   attr :distance, :float, default: nil
+  attr :cancelled?, :boolean, default: false
   attr :type, TrainingSchedule.Workouts.Type, required: true
   attr :rest, :global, include: ~w(draggable replace)
   slot :inner_block, required: true
@@ -45,9 +46,9 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   def card(%{action: nil} = assigns) do
     ~H"""
     <div class={card_shared()} id={@id} style={"background-color:#{@type.color}"} {@rest}>
-      <p class={card_title()}><%= @type.name %></p>
-      <p class={card_content()}><%= render_slot(@inner_block) %></p>
-      <p :if={@distance}><.distance distance={@distance} /></p>
+      <p class={card_title(assigns)}><%= @type.name %></p>
+      <p :if={not @cancelled?} class={card_content(assigns)}><%= render_slot(@inner_block) %></p>
+      <p :if={@distance}><.distance distance={@distance} class={card_distance(assigns)} /></p>
     </div>
     """
   end
@@ -56,9 +57,9 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
     ~H"""
     <.link id={@id} patch={@action} {@rest}>
       <div class={[card_shared(), "hover:ring-4"]} style={"background-color:#{@type.color}"}>
-        <p class="break-words font-bold"><%= @type.name %></p>
-        <p class="break-words font-light"><%= render_slot(@inner_block) %></p>
-        <p :if={@distance}><.distance distance={@distance} /></p>
+        <p class={card_title(assigns)}><%= @type.name %></p>
+        <p :if={not @cancelled?} class={card_content(assigns)}><%= render_slot(@inner_block) %></p>
+        <p :if={@distance}><.distance distance={@distance} class={card_distance(assigns)} /></p>
       </div>
     </.link>
     """
@@ -68,8 +69,11 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
     "space-y-1p flex w-64 lg:w-32 xl:w-40 flex-col rounded p-4 m-2 text-center"
   end
 
-  defp card_title, do: "break-words font-bold"
-  defp card_content, do: "break-words font-light"
+  defp card_title(%{cancelled?: true}), do: "break-words font-bold line-through decoration-2"
+  defp card_title(_), do: "break-words font-bold"
+  defp card_content(_), do: "break-words font-light"
+  defp card_distance(%{cancelled?: true}), do: "line-through"
+  defp card_distance(_), do: ""
 
   # TODO: highlight current week / day
   # TODO: Support for arbitrary amount of days, requires changes to tailwind grid template

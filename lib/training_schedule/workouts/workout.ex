@@ -41,6 +41,7 @@ defmodule TrainingSchedule.Workouts.Workout do
     field :distance, :float
     field :description_fields, {:map, :string}
     field :description, :string, virtual: true
+    field :cancelled?, :boolean, default: false
 
     belongs_to :user, TrainingSchedule.Accounts.User
     belongs_to :type, TrainingSchedule.Workouts.Type
@@ -58,6 +59,7 @@ defmodule TrainingSchedule.Workouts.Workout do
       distance: workout.distance,
       description_fields: workout.description_fields,
       description: workout.description,
+      cancelled?: workout.cancelled?,
       user_id: workout.user_id,
       type_id: workout.type_id,
       type: workout.type,
@@ -68,7 +70,7 @@ defmodule TrainingSchedule.Workouts.Workout do
   @spec changeset(t(), %{String.t() => any()} | %{atom() => any()}) :: Changeset.t()
   def changeset(workout, attrs) do
     workout
-    |> cast(attrs, [:date, :description_fields, :distance, :type_id, :user_id])
+    |> cast(attrs, [:date, :description_fields, :distance, :cancelled?, :type_id, :user_id])
     |> validate_required([:date, :distance, :type_id, :user_id])
     |> assoc_constraint(:type)
     |> assoc_constraint(:user)

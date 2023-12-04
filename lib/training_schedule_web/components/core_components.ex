@@ -195,7 +195,8 @@ defmodule TrainingScheduleWeb.CoreComponents do
     assigns = assign_new(assigns, :checked, fn -> input_equals?(assigns.value, "true") end)
 
     ~H"""
-    <label phx-feedback-for={@name} class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+    <div class="mb-4 flex flex-row items-end justify-between">
+      <.label for={@id} phx-feedback-for={@name}><%= @label %></.label>
       <input type="hidden" name={@name} value="false" />
       <input
         type="checkbox"
@@ -203,17 +204,16 @@ defmodule TrainingScheduleWeb.CoreComponents do
         name={@name}
         value="true"
         checked={@checked}
-        class={["rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900", @class]}
+        class={["rounded", "text-sky-500", @class]}
         {@rest}
       />
-      <%= @label %>
-    </label>
+    </div>
     """
   end
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="mb-4">
+    <div class="mb-2">
       <.label for={@id} phx-feedback-for={@name}><%= @label %></.label>
       <div class={input_border(@errors)}>
         <select
@@ -267,7 +267,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def input(assigns) do
     ~H"""
-    <div>
+    <div class="mb-2">
       <.label for={@id} phx-feedback-for={@name}><%= @label %></.label>
       <input
         type={@type}
@@ -306,7 +306,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="mt-6" {@rest}>
+    <label for={@for} {@rest}>
       <p class="text-sm font-light dark:text-slate-100">
         <%= render_slot(@inner_block) %>
       </p>
