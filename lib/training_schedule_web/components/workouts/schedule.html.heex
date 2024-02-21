@@ -12,7 +12,8 @@
 <div
   id="workout_schedule"
   class="grid w-full grid-cols-1 lg:grid-cols-7 xl:grid-cols-schedule"
-  phx-hook={if @modify_fn, do: "WorkoutDragAndDrop"}
+  phx-hook={if @modify_fn, do: "WorkoutHooks"}
+  editable={!!@modify_fn}
 >
   <%= for cycle <- @cycles do %>
     <div class={[

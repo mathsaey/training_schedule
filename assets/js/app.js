@@ -20,20 +20,20 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
-import WorkoutDragAndDropHooks from "./workout-drag-drop"
-import DateFormatHooks from "./date-format"
+import WorkoutHooks from "./workout-hooks"
+import DateHooks from "./date-hooks"
 
 let Hooks = {}
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   params: {_csrf_token: csrfToken},
   hooks: {
-    WorkoutDragAndDrop: WorkoutDragAndDropHooks,
-    DateFormat: DateFormatHooks
+    WorkoutHooks: WorkoutHooks,
+    DateHooks: DateHooks
   }
 })
 
-// Paste to clipboard even listener
+// Paste to clipboard event listener
 window.addEventListener("phx:copy", (event) => {
   let link = event.target.textContent.trim();
   navigator.clipboard.writeText(link);

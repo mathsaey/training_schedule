@@ -122,7 +122,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
 
   def date(%{notime: true} = assigns) do
     ~H"""
-    <div id={@id} format={@format} phx-hook="DateFormat" class={["invisible", @class]}>
+    <div id={@id} format={@format} phx-hook="DateHooks" class={["invisible", @class]}>
       <%= @date %>
     </div>
     """
@@ -134,7 +134,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
       id={@id}
       datetime={@date}
       format={@format}
-      phx-hook="DateFormat"
+      phx-hook="DateHooks"
       class={["invisible", @class]}
     >
       <%= @date %>

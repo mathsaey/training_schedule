@@ -1,5 +1,5 @@
 /* TrainingSchedule.ex
- * Copyright (c) 2023, Mathijs Saey
+ * Copyright (c) 2023 - 2024, Mathijs Saey
  *
  * TrainingSchedule.ex is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
