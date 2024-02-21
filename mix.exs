@@ -61,7 +61,7 @@ defmodule TrainingSchedule.MixProject do
 
       # Database
       {:ecto_sql, "~> 3.11"},
-      {:ecto_sqlite3, "~> 0.12"},
+      {:ecto_sqlite3, "~> 0.15"},
 
       # Dev / testing tools
       {:tailwind_formatter, "~> 0.3", only: :dev, runtime: false},
