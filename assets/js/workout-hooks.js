@@ -16,9 +16,10 @@
  */
 
 export default {
+  updated() { highlightCurrentDay() },
   mounted() {
-    console.log("mounted!");
-
+    highlightCurrentDay()
+    // Add drag and drop event listeners only if component is editable
     if (this.el.hasAttribute("editable")) {
       this.el.addEventListener("dragstart", dragstart)
       this.el.addEventListener("dragenter", dragenter)
@@ -26,6 +27,37 @@ export default {
       this.el.addEventListener("drop", (e) => {drop(e, this)})
     }
   }
+}
+
+// Date Highlight
+// --------------
+
+var currentDayCell = null;
+const currentDayClasses = ["bg-gray-200", "dark:bg-gray-600"]
+const secondsInDay = 24 * 60 * 60;
+
+function highlightCurrentDay() {
+  console.log("highlight!");
+
+  let now = new Date();
+  let month = (now.getMonth() + 1).toString().padStart(2, '0');
+  let id = `cell_${now.getFullYear()}-${month}-${now.getDate()}`;
+  let cell = document.getElementById(id);
+
+  if (cell != currentDayCell && currentDayCell != null) {
+    currentDayCell.classList.remove(...currentDayClasses);
+  }
+
+  currentDayCell = cell;
+  cell.classList.add(...currentDayClasses);
+
+  // Schedule this function to run again when the day changes
+  let hoursOfDayElapsed = 60 * 60 * now.getHours()
+  let minutesOfDayElapsed = hoursOfDayElapsed + 60 * now.getMinutes()
+  let secondsOfDayElapsed = minutesOfDayElapsed + now.getSeconds();
+  let wait_time = 60 - now.getSeconds();
+
+  setTimeout(highlightCurrentDay, 1000 * wait_time);
 }
 
 // Drag and Drop

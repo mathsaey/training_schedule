@@ -75,7 +75,6 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   defp card_distance(%{cancelled?: true}), do: "line-through"
   defp card_distance(_), do: ""
 
-  # TODO: highlight current week / day
   # TODO: Support for arbitrary amount of days, requires changes to tailwind grid template
 
   attr :cycles, :list, required: true
