@@ -37,8 +37,6 @@ const currentDayClasses = ["bg-gray-200", "dark:bg-gray-600"]
 const secondsInDay = 24 * 60 * 60;
 
 function highlightCurrentDay() {
-  console.log("highlight!");
-
   let now = new Date();
   let month = (now.getMonth() + 1).toString().padStart(2, '0');
   let id = `cell_${now.getFullYear()}-${month}-${now.getDate()}`;
