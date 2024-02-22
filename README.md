@@ -36,17 +36,17 @@ Under development:
 
 ## Getting Started
 
-### Using docker-compose
+### Using docker compose
 
-- Copy the `docker-compose.example.yml` file in this repository and adjust it
+- Copy the `docker compose.example.yml` file in this repository and adjust it
   as needed.
 
-- `$ docker-compose pull`
+- `$ docker compose pull`
 
-- `$ docker-compose up`
+- `$ docker compose up`
 
 - Once the container is up and running, you need to create an initial user:
-  `$ docker-compose exec app ./bin/training_schedule rpc 'TrainingSchedule.Accounts.create!(%{username: "<your username>", password: "<your password>", admin?: true})'`
+  `$ docker compose exec app ./bin/training_schedule rpc 'TrainingSchedule.Accounts.create!(%{username: "<your username>", password: "<your password>", admin?: true})'`
 
   Note that this command needs to be executed _while the container is running_.
 
