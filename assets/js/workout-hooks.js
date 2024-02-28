@@ -94,6 +94,11 @@ function drop(e, liveView) {
   let data = JSON.parse(e.dataTransfer.getData("text/plain"))
   let dest = findDropableParent(e.target)
   let action = e.dataTransfer.dropEffect
+
+  // Chrome and Safari always set the dropEffect to none.
+  // Work around this by always using move if no action is provided.
+  if (action == "none") { action = "move" }
+
   if (dest.id == data.source && action == "move") { return }
 
   let workout = e.view.document.getElementById(data.workout)
@@ -105,7 +110,7 @@ function drop(e, liveView) {
 
   dest.classList.remove(...dropClasses)
 
-  if (e.dataTransfer.dropEffect == "move") {
+  if (action == "move") {
     workout.classList.add(loadingClass)
     dest.appendChild(workout)
   } else {
