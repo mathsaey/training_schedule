@@ -39,7 +39,8 @@ const secondsInDay = 24 * 60 * 60;
 function highlightCurrentDay() {
   let now = new Date();
   let month = (now.getMonth() + 1).toString().padStart(2, '0');
-  let id = `cell_${now.getFullYear()}-${month}-${now.getDate()}`;
+  let day = now.getDate().toString().padStart(2, '0');
+  let id = `cell_${now.getFullYear()}-${month}-${day}`;
   let cell = document.getElementById(id);
 
   if (cell != currentDayCell && currentDayCell != null) {
