@@ -38,7 +38,7 @@ Under development:
 
 ### Using docker compose
 
-- Copy the `docker compose.example.yml` file in this repository and adjust it
+- Copy the `docker-compose.example.yml` file in this repository and adjust it
   as needed.
 
 - `$ docker compose pull`
