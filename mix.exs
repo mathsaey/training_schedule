@@ -51,7 +51,7 @@ defmodule TrainingSchedule.MixProject do
       {:phoenix, "~> 1.7", override: true},
       {:plug_cowboy, "~> 2.6"},
       {:phoenix_html, "~> 3.3"},
-      {:phoenix_ecto, "~> 4.4"},
+      {:phoenix_ecto, "~> 4.6"},
       {:phoenix_live_view, "~> 0.20"},
 
       # Frontend
@@ -65,7 +65,7 @@ defmodule TrainingSchedule.MixProject do
 
       # Dev / testing tools
       {:tailwind_formatter, "~> 0.3", only: :dev, runtime: false},
-      {:phoenix_live_reload, "~> 1.4", only: :dev},
+      {:phoenix_live_reload, "~> 1.5", only: :dev},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
       {:sobelow, "~> 0.13", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: :dev, runtime: false},
