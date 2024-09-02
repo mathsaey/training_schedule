@@ -55,22 +55,18 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   def handle_info(_, socket), do: {:noreply, load_workouts(socket)}
 
   @impl true
-  def handle_event("workout_dragged", data, socket) do
+  def handle_event(event, data, socket) do
     %{
       "workout" => <<"workout_", id::binary>>,
       "target" => <<"cell_", date::binary>>,
-      "action" => action
     } = data
 
-    id = String.to_integer(id)
-
-    case action do
-      "copy" -> id |> Workouts.duplicate() |> Workouts.create(%{date: date})
-      "move" -> Workouts.update(id, %{date: date})
-    end
-
+    event(event, String.to_integer(id), date)
     {:noreply, load_workouts(socket)}
   end
+
+  defp event("move", id, date), do: Workouts.update(id, %{date: date})
+  defp event("copy", id, date), do: id |> Workouts.duplicate() |> Workouts.create(%{date: date})
 
   defp redirect_to_default_url(socket) do
     from = Date.utc_today() |> Date.beginning_of_week()

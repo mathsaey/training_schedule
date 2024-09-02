@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {moveWorkout, copyWorkout} from './schedule.js'
+
 export default {
   updated() { highlightCurrentDay() },
   mounted() {
@@ -102,23 +104,12 @@ function drop(e, liveView) {
 
   if (dest.id == data.source && action == "move") { return }
 
-  let workout = e.view.document.getElementById(data.workout)
-  liveView.pushEvent("workout_dragged", {
-    "action": action,
-    "workout": data.workout,
-    "target": dest.id,
-  })
-
   dest.classList.remove(...dropClasses)
+  let workout = e.view.document.getElementById(data.workout)
 
   if (action == "move") {
-    workout.classList.add(loadingClass)
-    dest.appendChild(workout)
+    moveWorkout(liveView, workout, dest)
   } else {
-    let copy = workout.cloneNode(true)
-    copy.id = `${copy.id}_copy_${dest.id}`
-    copy.setAttribute("draggable", false)
-    copy.classList.add(loadingClass)
-    dest.appendChild(copy)
+    copyWorkout(liveView, workout, dest)
   }
 }
