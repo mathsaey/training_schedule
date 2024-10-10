@@ -97,7 +97,9 @@ defmodule TrainingScheduleWeb do
 
   defp html_helpers do
     quote do
-      use Phoenix.HTML
+      import Phoenix.HTML
+      import Phoenix.HTML.Form
+
       alias TrainingScheduleWeb.Endpoint
       # Core UI components and translation
       import TrainingScheduleWeb.CoreComponents
