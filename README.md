@@ -22,6 +22,8 @@ some upcoming features, limited time means they may not land any time soon.
 Under development:
 
 - Multi-account support (Done, with the exception of a UI to add users)
+- Vim keybinds for the workout schedule (Currently, only movement and creating
+new workouts is supported)
 
 ### Ideas for future versions
 

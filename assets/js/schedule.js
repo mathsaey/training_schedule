@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export { copyWorkout, moveWorkout };
-
 const loadingClass = "opacity-50"
 
 function addTemporary(workout, destination) {
@@ -28,15 +26,23 @@ function pushEvent(lv, ev, workoutId, destDateId) {
   lv.pushEvent(ev, {"workout": workoutId, "target": destDateId})
 }
 
-function moveWorkout(lv, workout, destination) {
+export function moveWorkout(lv, workout, destination) {
   addTemporary(workout, destination)
   pushEvent(lv, "move", workout.id, destination.id)
 }
 
-function copyWorkout(lv, workout, destination) {
+export function copyWorkout(lv, workout, destination) {
     let copy = workout.cloneNode(true)
     copy.id = `${copy.id}_copy_${destination.id}`
     copy.setAttribute("draggable", false)
     addTemporary(copy, destination)
     pushEvent(lv, "copy", workout.id, destination.id)
+}
+
+export function getCurrentDayCell() {
+  let now = new Date();
+  let month = (now.getMonth() + 1).toString().padStart(2, '0');
+  let day = now.getDate().toString().padStart(2, '0');
+  let id = `cell_${now.getFullYear()}-${month}-${day}`;
+  return document.getElementById(id);
 }

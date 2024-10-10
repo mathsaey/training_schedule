@@ -15,12 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {moveWorkout, copyWorkout} from './schedule.js'
+import {moveWorkout, copyWorkout, getCurrentDayCell} from './schedule.js';
+import Vim from './vim.js';
 
 export default {
-  updated() { highlightCurrentDay() },
+  updated() {
+    highlightCurrentDay()
+    Vim.onUpdate(this)
+  },
   mounted() {
     highlightCurrentDay()
+    Vim.onMount(this)
+
     // Add drag and drop event listeners only if component is editable
     if (this.el.hasAttribute("editable")) {
       this.el.addEventListener("dragstart", dragstart)
@@ -34,16 +40,13 @@ export default {
 // Date Highlight
 // --------------
 
-var currentDayCell = null;
+let currentDayCell = null;
 const currentDayClasses = ["bg-gray-200", "dark:bg-gray-600"]
 const secondsInDay = 24 * 60 * 60;
 
 function highlightCurrentDay() {
-  let now = new Date();
-  let month = (now.getMonth() + 1).toString().padStart(2, '0');
-  let day = now.getDate().toString().padStart(2, '0');
-  let id = `cell_${now.getFullYear()}-${month}-${day}`;
-  let cell = document.getElementById(id);
+  let cell = getCurrentDayCell();
+  if (!currentDayCell) { return }
 
   if (cell != currentDayCell && currentDayCell != null) {
     currentDayCell.classList.remove(...currentDayClasses);
@@ -53,6 +56,7 @@ function highlightCurrentDay() {
   cell.classList.add(...currentDayClasses);
 
   // Schedule this function to run again when the day changes
+  let now = new Date();
   let hoursOfDayElapsed = 60 * 60 * now.getHours()
   let minutesOfDayElapsed = hoursOfDayElapsed + 60 * now.getMinutes()
   let secondsOfDayElapsed = minutesOfDayElapsed + now.getSeconds();
