@@ -58,7 +58,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   def handle_event(event, data, socket) do
     %{
       "workout" => <<"workout_", id::binary>>,
-      "target" => <<"cell_", date::binary>>,
+      "target" => <<"cell_", date::binary>>
     } = data
 
     event(event, String.to_integer(id), date)

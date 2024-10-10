@@ -31,13 +31,13 @@ defmodule TrainingScheduleWeb.ShareLive.Show do
         |> assign(share: nil, cycles: [])
         |> then(&{:ok, &1})
 
-      share = %Share{user_id: user_id} ->
+      share = %Share{user_id: user_id, name: name} ->
         if connected?(socket) do
           Endpoint.subscribe("workouts:#{user_id}")
           Endpoint.subscribe("shares:#{id}")
         end
 
-        {:ok, socket |> assign(share: share) |> load_workouts(share)}
+        {:ok, socket |> assign(share: share, name: name) |> load_workouts(share)}
     end
   end
 
