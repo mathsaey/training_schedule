@@ -100,4 +100,9 @@ defmodule TrainingSchedule.Workouts.Workout do
   def derive_description(workout = %__MODULE__{}), do: workout
 
   def derive_description(nil), do: nil
+
+  @spec to_copy_template(t()) :: map()
+  def to_copy_template(workout) do
+    Map.take(workout, [:distance, :description_fields, :cancelled, :type_id])
+  end
 end

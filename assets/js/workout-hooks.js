@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {moveWorkout, copyWorkout, getCurrentDayCell} from './schedule.js';
+import {moveWorkout, copyWorkouts, getCurrentDayCell} from './schedule.js';
 import Vim from './vim.js';
 
 export default {
@@ -114,6 +114,6 @@ function drop(e, liveView) {
   if (action == "move") {
     moveWorkout(liveView, workout, dest)
   } else {
-    copyWorkout(liveView, workout, dest)
+    copyWorkouts(liveView, [workout], [dest])
   }
 }

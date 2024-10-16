@@ -18,25 +18,46 @@
 const loadingClass = "opacity-50"
 
 function addTemporary(workout, destination) {
+  workout.setAttribute("draggable", false)
   workout.classList.add(loadingClass)
   destination.appendChild(workout)
 }
 
-function pushEvent(lv, ev, workoutId, destDateId) {
-  lv.pushEvent(ev, {"workout": workoutId, "target": destDateId})
-}
+function workoutPayload(workout) { return parseInt(workout.id.slice(8)) }
+function destinationPayload(destination) { return destination.id.slice(5) }
 
 export function moveWorkout(lv, workout, destination) {
   addTemporary(workout, destination)
-  pushEvent(lv, "move", workout.id, destination.id)
+  lv.pushEvent("move", {
+      "workout": workoutPayload(workout),
+      "target": destinationPayload(destination)
+  })
 }
 
-export function copyWorkout(lv, workout, destination) {
-    let copy = workout.cloneNode(true)
-    copy.id = `${copy.id}_copy_${destination.id}`
-    copy.setAttribute("draggable", false)
-    addTemporary(copy, destination)
-    pushEvent(lv, "copy", workout.id, destination.id)
+export function deleteWorkouts(lv, workouts) {
+  let payload = workouts.map((workout) => {
+    workout.remove();
+    return workoutPayload(workout);
+  })
+
+  lv.pushEvent("delete", payload);
+}
+
+export function copyWorkouts(lv, workouts, destinations) {
+  let payload = workouts.map((workout, idx) => {
+    let dest = destinations[idx];
+    let copy = workout.cloneNode(true);
+    copy.id = null;
+
+    addTemporary(copy, dest);
+
+    return {
+      "destination": destinationPayload(dest),
+      "template": workout.dataset.template
+    }
+  })
+
+  lv.pushEvent("create", payload);
 }
 
 export function getCurrentDayCell() {

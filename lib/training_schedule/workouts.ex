@@ -161,8 +161,15 @@ defmodule TrainingSchedule.Workouts do
     |> maybe_broadcast(:workouts, :update)
   end
 
-  @spec delete(Workout.t() | integer()) :: {:ok, Workout.t()} | {:error, Changeset.t()}
-  def delete(id) when is_integer(id), do: id |> get() |> Repo.delete()
+  @spec delete(Workout.t() | integer() | [integer()]) ::
+          {:ok, Workout.t()} | {:error, Changeset.t()}
+  def delete(id) when is_integer(id), do: delete(%Workout{id: id})
+
+  def delete(ids) when is_list(ids) do
+    from(w in Workout, where: w.id in ^ids)
+    |> Repo.delete_all()
+    |> maybe_broadcast(:workouts, :delete)
+  end
 
   def delete(workout = %Workout{}) do
     workout
@@ -182,6 +189,34 @@ defmodule TrainingSchedule.Workouts do
     user
     |> Ecto.build_assoc(:workouts, attrs)
     |> Workout.derive_description()
+  end
+
+  @doc """
+  Create a template from which to create copies of this workout.
+
+  Creates a map which can be used to create new workouts that have the same properties as the
+  provided workout.
+  """
+  @spec to_copy_template(Workout.t()) :: map()
+  def to_copy_template(workout), do: Workout.to_copy_template(workout)
+
+  @doc """
+  Batch create workouts based on copy templates combined with a date.
+  """
+  @spec batch_insert_from_copy_templates(%{String.t() => any()}) :: :ok
+  def batch_insert_from_copy_templates(attr_list) do
+    inserts =
+      Enum.map(attr_list, fn attrs ->
+        %Workout{}
+        |> Workout.changeset(attrs)
+        |> Changeset.apply_action!(:create)
+        |> Map.from_struct()
+        |> Map.take([:date, :distance, :description_fields, :cancelled?, :user_id, :type_id])
+      end)
+
+    Repo.insert_all(Workout, inserts)
+    unless Enum.empty?(inserts), do: broadcast(hd(inserts).user_id, :workouts, :create, nil)
+    :ok
   end
 
   defp maybe_load_workout_fields({:ok, workout}), do: {:ok, load_workout_fields(workout)}
@@ -207,7 +242,11 @@ defmodule TrainingSchedule.Workouts do
   defp maybe_broadcast(t = {:error, _}, _, _), do: t
 
   defp maybe_broadcast(t = {:ok, item}, topic, action) do
-    Phoenix.PubSub.broadcast(PubSub, "workouts:#{item.user_id}", {topic, action, item})
+    broadcast(item.user_id, topic, action, item)
     t
+  end
+
+  defp broadcast(user_id, topic, action, item) do
+    Phoenix.PubSub.broadcast(PubSub, "workouts:#{user_id}", {topic, action, item})
   end
 end

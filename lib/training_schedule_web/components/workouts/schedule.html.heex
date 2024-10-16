@@ -73,7 +73,7 @@
         cancelled?={workout.cancelled?}
         replace
         draggable={if @modify?, do: true}
-        data-workout={if @modify?, do: "xxx"}
+        data-template={if @modify?, do: workout |> Workouts.to_copy_template() |> Jason.encode!()}
         action={if @modify?, do: ~p"/from/#{@from}/to/#{@to}/edit/#{workout.date}/#{workout.id}"}
       >
         <%= workout.description %>

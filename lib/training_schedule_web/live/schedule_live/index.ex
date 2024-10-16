@@ -55,18 +55,27 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   def handle_info(_, socket), do: {:noreply, load_workouts(socket)}
 
   @impl true
-  def handle_event(event, data, socket) do
-    %{
-      "workout" => <<"workout_", id::binary>>,
-      "target" => <<"cell_", date::binary>>
-    } = data
-
-    event(event, String.to_integer(id), date)
+  def handle_event("move", %{"workout" => id, "target" => date}, socket) do
+    Workouts.update(id, %{date: date})
     {:noreply, load_workouts(socket)}
   end
 
-  defp event("move", id, date), do: Workouts.update(id, %{date: date})
-  defp event("copy", id, date), do: id |> Workouts.duplicate() |> Workouts.create(%{date: date})
+  def handle_event("delete", data, socket) do
+    Workouts.delete(data)
+    {:noreply, load_workouts(socket)}
+  end
+
+  def handle_event("create", data, socket) do
+    data
+    |> Enum.map(fn %{"destination" => date, "template" => json} ->
+      json
+      |> Jason.decode!()
+      |> Map.merge(%{"date" => date, "user_id" => socket.assigns.user.id})
+    end)
+    |> Workouts.batch_insert_from_copy_templates()
+
+    {:noreply, load_workouts(socket)}
+  end
 
   defp redirect_to_default_url(socket) do
     from = Date.utc_today() |> Date.beginning_of_week()

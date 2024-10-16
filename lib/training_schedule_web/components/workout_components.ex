@@ -17,6 +17,7 @@
 defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   use Phoenix.Component
   use TrainingScheduleWeb, :html
+  alias TrainingSchedule.Workouts
   import TrainingScheduleWeb.CoreComponents
 
   embed_templates "workouts/*"
@@ -41,7 +42,7 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   attr :distance, :float, default: nil
   attr :cancelled?, :boolean, default: false
   attr :type, TrainingSchedule.Workouts.Type, required: true
-  attr :rest, :global, include: ~w(draggable replace)
+  attr :rest, :global, include: ~w(draggable replace data-template)
   slot :inner_block, required: true
 
   def card(%{action: nil} = assigns) do

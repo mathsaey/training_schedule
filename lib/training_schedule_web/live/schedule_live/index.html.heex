@@ -12,12 +12,7 @@
   </div>
 </div>
 
-<WorkoutComponents.schedule
-  cycles={@cycles}
-  modify?={true}
-  from={@from}
-  to={@to}
-/>
+<WorkoutComponents.schedule cycles={@cycles} modify?={true} from={@from} to={@to} />
 
 <%= case @live_action do %>
   <% :index -> %>
