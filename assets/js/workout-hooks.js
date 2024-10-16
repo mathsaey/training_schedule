@@ -46,7 +46,7 @@ const secondsInDay = 24 * 60 * 60;
 
 function highlightCurrentDay() {
   let cell = getCurrentDayCell();
-  if (!currentDayCell) { return }
+  if (!cell) { return }
 
   if (cell != currentDayCell && currentDayCell != null) {
     currentDayCell.classList.remove(...currentDayClasses);
