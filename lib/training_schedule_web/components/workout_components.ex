@@ -16,6 +16,7 @@
 
 defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   use Phoenix.Component
+  use TrainingScheduleWeb, :html
   import TrainingScheduleWeb.CoreComponents
 
   embed_templates "workouts/*"
@@ -78,7 +79,7 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   # TODO: Support for arbitrary amount of days, requires changes to tailwind grid template
 
   attr :cycles, :list, required: true
-  attr :modify_fn, :any, default: nil
+  attr :modify?, :boolean, default: false
 
   # defined in workouts/schedule.html.heex
   def schedule(assigns)

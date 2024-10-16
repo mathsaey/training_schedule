@@ -13,7 +13,7 @@
   id="workout_schedule"
   class="grid w-full grid-cols-1 lg:grid-cols-7 xl:grid-cols-schedule"
   phx-hook="WorkoutHooks"
-  editable={!!@modify_fn}
+  editable={@modify?}
 >
   <%= for cycle <- @cycles do %>
     <div class={[
@@ -40,11 +40,11 @@
       :for={{date, workouts} <- cycle.days}
       id={"cell_#{date}"}
       class={["flex flex-col items-center", schedule_cell_border()]}
-      dropable={if @modify_fn, do: "true"}
+      dropable={if @modify?, do: true}
     >
       <div class="flex w-full justify-between p-2">
-        <%= if @modify_fn do %>
-          <.link patch={@modify_fn.({:create, date})} replace>
+        <%= if @modify? do %>
+          <.link patch={~p"/from/#{@from}/to/#{@to}/new/#{date}"} replace>
             <Heroicons.plus_circle
               mini
               class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
@@ -72,8 +72,9 @@
         distance={workout.distance}
         cancelled?={workout.cancelled?}
         replace
-        draggable={if @modify_fn, do: "true"}
-        action={if @modify_fn, do: @modify_fn.({:edit, workout})}
+        draggable={if @modify?, do: true}
+        data-workout={if @modify?, do: "xxx"}
+        action={if @modify?, do: ~p"/from/#{@from}/to/#{@to}/edit/#{workout.date}/#{workout.id}"}
       >
         <%= workout.description %>
       </.card>

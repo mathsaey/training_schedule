@@ -14,12 +14,9 @@
 
 <WorkoutComponents.schedule
   cycles={@cycles}
-  modify_fn={
-    fn
-      {:create, date} -> ~p"/from/#{@from}/to/#{@to}/new/#{date}"
-      {:edit, workout} -> ~p"/from/#{@from}/to/#{@to}/edit/#{workout.date}/#{workout.id}"
-    end
-  }
+  modify?={true}
+  from={@from}
+  to={@to}
 />
 
 <%= case @live_action do %>
