@@ -1,7 +1,7 @@
 <div class="flex h-full w-full flex-col items-center justify-center">
   <.form
     :let={f}
-    for={@conn}
+    for={@conn.params["session"]}
     as={:login}
     action={~p"/login?#{@conn.query_params}"}
     class="mx-8 my-8 flex w-5/6 flex-col items-center rounded bg-slate-200 pb-6 shadow-md dark:bg-slate-600 sm:w-96"
