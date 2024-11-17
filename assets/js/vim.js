@@ -68,6 +68,7 @@ function initState(lv) {
   cur = schedule.getCurrentDayCell();
 
   document.body.addEventListener("keydown", processKey);
+  document.body.addEventListener("click", processClick);
 }
 
 function updateGrid(lv) {
@@ -86,9 +87,28 @@ function updateGrid(lv) {
 
   // Select the first cell if the schedule does not contain the current day
   if (!cur) { cur = grid[0].cell }
+  setPosToCurrent();
+}
+
+// Current cell & Position
+// -----------------------
+
+function isCell(div) { return div.id.startsWith('cell_') }
+function isWorkout(div) { return div.id.startsWith('workout_') }
+
+function findParentCell(div) {
+  let current = div;
+  while (current) {
+    if (isCell(current)) { return current }
+    current = current.parentElement;
+  }
+}
+
+function setPosToCurrent() {
+  let currentCell = isWorkout(cur) ? cur : findParentCell(cur);
 
   for (const [idx, obj] of grid.entries()) {
-    if (cur === obj.cell) {
+    if (currentCell === obj.cell) {
       pos = idx
       break;
     }
@@ -106,21 +126,57 @@ function showMarker() {
 
 function clearMarker() { cur.classList.remove(...markerCellClasses) }
 
-
 // Motions
 // -------
 
 function posToidxPair(pos) {return [Math.trunc(pos / 7), pos % 7]}
 function idxPairToPos([i, j]) { return i * 7 + j }
 
+function resFromIdxPair(pair) {
+  let res = idxPairToPos(pair);
+  return [res, grid[res].cell];
+}
+
 function idxPairMotion(updateIdx) {
   return function(pos, _) {
     let [i, j] = posToidxPair(pos)
     let [ni, nj] = updateIdx(i, j);
     let res = (ni < 0 || nj < 0 || ni > bottom || nj > 6) ? [i, j] : [ni, nj];
-    res = idxPairToPos(res);
+    return resFromIdxPair(res);
+  }
+}
 
-    return [res, grid[res].cell];
+function workoutWiseMotion(getSlice, select, selectInCurrent) {
+  return function(pos, idx) {
+    for (const obj of getSlice(pos)) {
+      if (obj.idx == pos && obj.workouts.length > 0) {
+        let selected = selectInCurrent(obj);
+        if (selected) { return [obj.idx, selected] }
+      } else if (obj.workouts.length > 0) {
+        let selected = select(obj);
+        return [obj.idx, selected];
+      }
+    }
+    return [pos, cur]
+  }
+}
+
+function braceMotion(getNext, getMax) {
+  return function(pos, idx) {
+    let [i, j] = posToidxPair(pos)
+    let max = getMax()
+
+    for (let r = i, n = getNext(r) ; r != max; r = n, n = getNext(n)) {
+      let slice = grid.slice(r * 7, r * 7 + 7);
+      let nSlice = grid.slice(n * 7, n * 7 + 7);
+
+      if (
+        !slice.every(obj => obj.workouts.length == 0) &&
+        nSlice.every(obj => obj.workouts.length == 0)
+      ) { return resFromIdxPair([n, j]); }
+    }
+
+    return resFromIdxPair([max, j]);
   }
 }
 
@@ -131,21 +187,41 @@ const motionL = idxPairMotion((i, j) => [i, j + 1])
 const motion0 = idxPairMotion((i, j) => [i, 0])
 const motion$ = idxPairMotion((i, j) => [i, 6])
 
-const motionLBrace = idxPairMotion((i, j) => {
-  for (let row = i - 1; row >= 0 ; row--) {
-    let slice = grid.slice(row * 7, row * 7 + 7)
-    if (slice.every(obj => obj.workouts.length == 0)) { return [row, j] }
-  }
-  return [i, j]
-})
+const motionLBrace = braceMotion((i) => i - 1, () => 0);
+const motionRBrace = braceMotion((i) => i + 1, () => bottom);
 
-const motionRBrace = idxPairMotion((i, j) => {
-  for (let row = i + 1; row <= bottom ; row++) {
-    let slice = grid.slice(row * 7, row * 7 + 7)
-    if (slice.every(obj => obj.workouts.length == 0)) { return [row, j] }
+const motionW = workoutWiseMotion(
+  (pos) => grid.slice(pos),
+  (obj) => obj.workouts[0],
+  (obj) => {
+    for (const [idx, workout] of obj.workouts.entries()) {
+      if (workout == cur && idx < obj.workouts.length) {
+        return obj.workouts[idx + 1]
+      }
+    }
+    return false
   }
-  return [i, j]
-})
+);
+
+const motionE = workoutWiseMotion(
+  (pos) => grid.slice(pos),
+  (obj) => obj.workouts[obj.workouts.length - 1],
+  (obj) => {
+    if (obj.workouts[obj.workouts.length - 1] == cur) { return false }
+    else { return obj.workouts[obj.workouts.length - 1]}
+  }
+)
+
+const motionB = workoutWiseMotion(
+  (pos) => grid.slice(0, pos + 1).reverse(),
+  (obj) => obj.workouts[obj.workouts.length - 1],
+  (obj) => {
+    for (const [idx, workout] of obj.workouts.entries()) {
+      if (workout == cur && idx > 0) { return obj.workouts[idx - 1] }
+    }
+    return false
+  }
+)
 
 function motionCaret(pos, cur) {
   let [i, j] = posToidxPair(pos)
@@ -154,51 +230,6 @@ function motionCaret(pos, cur) {
     if (obj.workouts.length > 0) { return [pos, obj.workouts[0]] }
   }
 
-  return [pos, cur]
-}
-
-function motionW(pos, cur) {
-  for (const obj of grid.slice(pos)) {
-    if (obj.idx == pos && obj.workouts.length > 0) {
-      let found = false
-      for (const workout of obj.workouts) {
-        if (found) { return [obj.idx, workout] }
-        else if (workout == cur) { found = true }
-      }
-    } else if (obj.workouts.length > 0) {
-      return [obj.idx, obj.workouts[0]]
-    }
-  }
-  return [pos, cur]
-}
-
-function motionE(pos, cur) {
-  for (const obj of grid.slice(pos)) {
-    if (
-      obj.idx == pos &&
-      obj.workouts.length > 0 &&
-      obj.workouts[obj.workouts.length - 1] == cur
-    ) {
-      continue
-    } else if (obj.workouts.length > 0) {
-      return [obj.idx, obj.workouts[obj.workouts.length - 1]]
-    }
-  }
-  return [pos, cur]
-}
-
-function motionB(pos, cur) {
-  for (const obj of grid.slice(0, pos + 1).reverse()) {
-    if (obj.idx == pos && obj.workouts.length > 0) {
-      let found = false
-      for (const workout of obj.workouts.values().toArray().reverse()) {
-        if (found) { return [obj.idx, workout] }
-        else if (workout == cur) { found = true }
-      }
-    } else if (obj.workouts.length > 0) {
-      return [obj.idx, obj.workouts[obj.workouts.length - 1]]
-    }
-  }
   return [pos, cur]
 }
 
@@ -220,6 +251,7 @@ function insert() { grid[pos].cell.querySelector("a").click() }
 
 function processKey(e) {
   if (!editable && !moveKeys.has(e.key)) { return }
+  if (document.getElementById("schedule_workout_popup")) { return }
   // console.log(e);
 
   switch (e.key) {
@@ -267,6 +299,22 @@ function processKey(e) {
     // Editing
     case 'i':
       insert()
+  }
+}
+
+function processClick(e) {
+  let target = e.target;
+
+  while (target) {
+    if (isCell(target) || isWorkout(target)) {
+      clearMarker();
+      cur = target;
+      setPosToCurrent();
+      showMarker();
+      return;
+    } else {
+      target = target.parentElement;
+    }
   }
 }
 
