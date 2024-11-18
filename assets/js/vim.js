@@ -19,12 +19,19 @@
 
 import * as schedule from './schedule.js';
 
+function isSafari() {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+}
+
 export default {
   onMount(liveView) {
+    // Don't support safari for now.
+    if (isSafari()) { return }
     initState(liveView)
     updateGrid(liveView)
   },
   onUpdate(_liveView) {
+    if (isSafari()) { return }
     updateGrid(liveView)
   }
 }
