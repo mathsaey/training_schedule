@@ -45,6 +45,8 @@ defmodule TrainingSchedule.MixProject do
       {:argon2_elixir, "~> 4.0"},
       # Parsing
       {:nimble_parsec, "~> 1.3"},
+      # Time zone database
+      {:tz, "~> 0.28"},
 
       # Webserver / framework
       {:jason, "~> 1.4"},

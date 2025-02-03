@@ -26,8 +26,14 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
 
   @impl true
   def mount(_, _, socket) do
-    if connected?(socket), do: Endpoint.subscribe("workouts:#{socket.assigns.user.id}")
-    {:ok, assign(socket, page_title: "Training Schedule")}
+    socket = assign(socket, page_title: "Training Schedule")
+
+    if connected?(socket) do
+      Endpoint.subscribe("workouts:#{socket.assigns.user.id}")
+      {:ok, assign(socket, :time_zone, get_connect_params(socket)["time_zone"])}
+    else
+      {:ok, socket}
+    end
   end
 
   @impl true
@@ -47,7 +53,11 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
         {:noreply, action(socket, socket.assigns.live_action, params)}
 
       _ ->
-        {:noreply, redirect_to_default_url(socket)}
+        if connected?(socket) do
+          {:noreply, redirect_to_user_tz_range(socket)}
+        else
+          {:noreply, load_with_default_range(socket)}
+        end
     end)
   end
 
@@ -75,6 +85,27 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
     |> Workouts.batch_insert_from_copy_templates()
 
     {:noreply, load_workouts(socket)}
+  end
+
+  defp load_with_default_range(socket) do
+    {from, to} = date_range(Date.utc_today())
+    load_between(socket, from, to)
+  end
+
+  defp redirect_to_user_tz_range(socket) do
+    now = case DateTime.now(socket.assigns.time_zone) do
+      {:ok, time} -> time
+      _ -> Date.utc_today()
+    end
+
+    {from, to} = date_range(now)
+    push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
+  end
+
+  defp date_range(now) do
+    from = now |> Date.beginning_of_week()
+    to = Date.add(from, @schedule_days)
+    {from, to}
   end
 
   defp redirect_to_default_url(socket) do

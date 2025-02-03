@@ -33,6 +33,8 @@ config :training_schedule, TrainingScheduleWeb.Endpoint,
 
 config :phoenix, :json_library, Jason
 
+config :elixir, :time_zone_database, Tz.TimeZoneDatabase
+
 config :esbuild,
   version: "0.18.6",
   default: [
