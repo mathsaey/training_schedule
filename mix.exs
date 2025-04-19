@@ -42,7 +42,7 @@ defmodule TrainingSchedule.MixProject do
   defp deps do
     [
       # Password hashing
-      {:argon2_elixir, "~> 4.0"},
+      {:argon2_elixir, "~> 4.1"},
       # Parsing
       {:nimble_parsec, "~> 1.3"},
       # Time zone database
@@ -59,11 +59,11 @@ defmodule TrainingSchedule.MixProject do
       # Frontend
       {:heroicons, "~> 0.5"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
 
       # Database
-      {:ecto_sql, "~> 3.11"},
-      {:ecto_sqlite3, "~> 0.15"},
+      {:ecto_sql, "~> 3.12"},
+      {:ecto_sqlite3, "~> 0.19"},
 
       # Dev / testing tools
       {:tailwind_formatter, "~> 0.3", only: :dev, runtime: false},
