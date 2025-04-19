@@ -203,7 +203,7 @@ defmodule TrainingSchedule.Workouts do
   @doc """
   Batch create workouts based on copy templates combined with a date.
   """
-  @spec batch_insert_from_copy_templates(%{String.t() => any()}) :: :ok
+  @spec batch_insert_from_copy_templates([%{String.t() => any()}]) :: :ok
   def batch_insert_from_copy_templates(attr_list) do
     inserts =
       Enum.map(attr_list, fn attrs ->
