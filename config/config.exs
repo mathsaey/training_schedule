@@ -26,6 +26,7 @@ config :training_schedule, TrainingSchedule.Repo, pool_size: 5
 config :training_schedule, TrainingScheduleWeb.Endpoint,
   live_view: [signing_salt: "RUqrhYyGIkTiSKvBOZ11/UMxEwEVaErx"],
   pubsub_server: TrainingSchedule.PubSub,
+  adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: TrainingScheduleWeb.ErrorHTML, json: TrainingScheduleWeb.ErrorJSON],
     layout: false

@@ -51,7 +51,7 @@ defmodule TrainingSchedule.MixProject do
       # Webserver / framework
       {:jason, "~> 1.4"},
       {:phoenix, "~> 1.7", override: true},
-      {:plug_cowboy, "~> 2.6"},
+      {:bandit, "~> 1.6"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_ecto, "~> 4.6"},
       {:phoenix_live_view, "~> 0.20"},
