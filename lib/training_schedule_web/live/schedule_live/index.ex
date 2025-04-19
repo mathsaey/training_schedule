@@ -93,10 +93,11 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   end
 
   defp redirect_to_user_tz_range(socket) do
-    now = case DateTime.now(socket.assigns.time_zone) do
-      {:ok, time} -> time
-      _ -> Date.utc_today()
-    end
+    now =
+      case DateTime.now(socket.assigns.time_zone) do
+        {:ok, time} -> time
+        _ -> Date.utc_today()
+      end
 
     {from, to} = date_range(now)
     push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
