@@ -81,6 +81,8 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
 
   attr :cycles, :list, required: true
   attr :modify?, :boolean, default: false
+  attr :from, :string
+  attr :to, :string
 
   # defined in workouts/schedule.html.heex
   def schedule(assigns)
