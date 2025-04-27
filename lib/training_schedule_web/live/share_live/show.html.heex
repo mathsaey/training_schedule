@@ -1,3 +1,4 @@
-<.header><%= @name %></.header>
-
-<WorkoutComponents.schedule cycles={@cycles} />
+<%= if @share do %>
+  <.header><%= @name %></.header>
+  <WorkoutComponents.schedule cycles={@cycles} />
+<% end %>
