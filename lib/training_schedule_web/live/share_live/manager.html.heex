@@ -49,10 +49,10 @@
       <td class="flex items-center justify-start px-2 py-4">
         <.link
           id={"link_#{share.id}"}
-          navigate={~p"/shares/#{share}"}
+          navigate={~p"/share/#{share}"}
           class="font-mono pr-4 text-blue-900 hover:underline dark:text-blue-400"
         >
-          <%= url(TrainingScheduleWeb.Endpoint, ~p"/shares/#{share}") %>
+          <%= url(TrainingScheduleWeb.Endpoint, ~p"/share/#{share}") %>
         </.link>
         <div title="Copy to clipboard">
           <Heroicons.clipboard

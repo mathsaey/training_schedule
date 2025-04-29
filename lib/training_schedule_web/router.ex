@@ -37,7 +37,7 @@ defmodule TrainingScheduleWeb.Router do
     get "/login", AuthController, :login
     post "/login", AuthController, :authenticate
 
-    live "/shares/:id", ShareLive.Show
+    live "/share/:id", ShareLive.Show
   end
 
   live_session :user, on_mount: TrainingScheduleWeb.AuthController do
