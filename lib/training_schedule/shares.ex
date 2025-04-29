@@ -29,7 +29,7 @@ defmodule TrainingSchedule.Shares do
   def delete(uuid), do: uuid |> get() |> Repo.delete() |> maybe_broadcast(:delete)
 
   def safe_delete(uuid, user_id) do
-    share = get(uuid) |> IO.inspect()
+    share = get(uuid)
 
     if user_id == share.user_id do
       share |> Repo.delete() |> maybe_broadcast(:delete)
