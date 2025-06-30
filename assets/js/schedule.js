@@ -35,6 +35,8 @@ export function moveWorkout(lv, workout, destination) {
 }
 
 export function deleteWorkouts(lv, workouts) {
+  if (workouts.length == 0) { return }
+
   let payload = workouts.map((workout) => {
     workout.remove();
     return workoutPayload(workout);
