@@ -256,6 +256,11 @@ function doMotion(motion) {
 
 function insert() { grid[pos].cell.querySelector("a").click() }
 
+function remove() {
+  let workouts = grid[pos].cell.querySelectorAll("[id^='workout_']");
+  schedule.deleteWorkouts(liveView, Array.from(workouts));
+}
+
 function processKey(e) {
   if (!editable && !moveKeys.has(e.key)) { return }
   if (document.getElementById("schedule_workout_popup")) { return }
@@ -306,6 +311,10 @@ function processKey(e) {
     // Editing
     case 'i':
       insert()
+      break;
+    case 'x':
+      remove()
+      break;
   }
 }
 
