@@ -162,19 +162,29 @@ defmodule TrainingSchedule.Workouts do
   end
 
   @spec delete(Workout.t() | integer() | [integer()]) ::
-          {:ok, Workout.t()} | {:error, Changeset.t()}
+          {:ok, Workout.t()} | {:ok, nil} | {:error, Changeset.t()}
   def delete(id) when is_integer(id), do: delete(%Workout{id: id})
-
-  def delete(ids) when is_list(ids) do
-    from(w in Workout, where: w.id in ^ids)
-    |> Repo.delete_all()
-    |> maybe_broadcast(:workouts, :delete)
-  end
+  def delete([id]) when is_integer(id), do: delete(%Workout{id: id})
 
   def delete(workout = %Workout{}) do
     workout
     |> Repo.delete()
     |> maybe_broadcast(:workouts, :delete)
+  end
+
+  def delete(ids) when is_list(ids) do
+    # We need to fetch the user from the workouts to be deleted so we can correctly broadcast
+    %Workout{user_id: user_id} = ids |> hd() |> get()
+
+    from(w in Workout, where: w.id in ^ids)
+    |> Repo.delete_all()
+    |> case do
+      {0, nil} ->
+        {:ok, nil}
+      _ ->
+        broadcast(user_id, :workouts, :delete, nil)
+        {:ok, nil}
+    end
   end
 
   @doc """
