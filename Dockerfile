@@ -19,9 +19,9 @@
 # - After the build phase, Elixir and its dependencies are no longer required.
 #   the run phase uses a stripped down container which executes the release.
 
-ARG ELIXIR_VERSION=1.18.3
-ARG OTP_VERSION=27.3.3
-ARG DEBIAN_VERSION=bookworm-20250407-slim
+ARG ELIXIR_VERSION=1.19.3
+ARG OTP_VERSION=28.1.1
+ARG DEBIAN_VERSION=trixie-20251103-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
@@ -82,7 +82,7 @@ RUN mix release
 
 FROM ${RUNNER_IMAGE}
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses6 locales \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Set the locale
