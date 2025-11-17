@@ -181,6 +181,7 @@ defmodule TrainingSchedule.Workouts do
     |> case do
       {0, nil} ->
         {:ok, nil}
+
       _ ->
         broadcast(user_id, :workouts, :delete, nil)
         {:ok, nil}
