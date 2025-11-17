@@ -27,8 +27,8 @@ defmodule TrainingScheduleWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
+  scope "/export", TrainingScheduleWeb do
+    get "/share/ics/:id", ShareExportController, :ics
   end
 
   scope "/", TrainingScheduleWeb do
