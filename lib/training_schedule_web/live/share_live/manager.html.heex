@@ -30,7 +30,7 @@
       <th class="p-2">Name</th>
       <th class="p-2">From</th>
       <th class="p-2">To</th>
-      <th class="p-2">Link</th>
+      <th class="p-2">Links</th>
       <th></th>
       <th></th>
     </tr>
@@ -47,19 +47,37 @@
       </td>
       <td class="px-2 py-4"><.date date={share.to} id={"#{share.id}-to"} format="full" /></td>
       <td class="flex items-center justify-start px-2 py-4">
-        <.link
-          id={"link_#{share.id}"}
-          navigate={~p"/share/#{share}"}
-          class="font-mono pr-4 text-blue-900 hover:underline dark:text-blue-400"
-        >
-          <%= url(TrainingScheduleWeb.Endpoint, ~p"/share/#{share}") %>
-        </.link>
-        <div title="Copy to clipboard">
-          <Heroicons.clipboard
-            outline
-            class="transition-color h-5 duration-100 active:stroke-blue-500"
-            phx-click={JS.dispatch("phx:copy", to: "#link_#{share.id}")}
-          />
+        <div class="flex flex-row pr-4">
+          <.link
+            id={"web_#{share.id}"}
+            navigate={~p"/share/#{share}"}
+            class="font-mono pr-4 text-blue-900 hover:underline dark:text-blue-400"
+          >
+            Schedule
+          </.link>
+          <div title="Copy to clipboard">
+            <Heroicons.clipboard
+              outline
+              class="transition-color h-5 duration-100 active:stroke-blue-500"
+              phx-click={JS.dispatch("phx:copy", to: "#web_#{share.id}")}
+            />
+          </div>
+        </div>
+        <div class="flex flex-row px-4">
+          <.link
+            id={"ics_#{share.id}"}
+            navigate={~p"/export/share/ics/#{share}"}
+            class="font-mono pr-4 text-blue-900 hover:underline dark:text-blue-400"
+          >
+            Calendar (ics)
+          </.link>
+          <div title="Copy to clipboard">
+            <Heroicons.clipboard
+              outline
+              class="transition-color h-5 duration-100 active:stroke-blue-500"
+              phx-click={JS.dispatch("phx:copy", to: "#ics_#{share.id}")}
+            />
+          </div>
         </div>
       </td>
       <td class="px-2 py-4 text-center">

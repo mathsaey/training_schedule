@@ -39,7 +39,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
 
 // Paste to clipboard event listener
 window.addEventListener("phx:copy", (event) => {
-  let link = event.target.textContent.trim();
+  const link = event.target.href;
   navigator.clipboard.writeText(link);
 })
 
