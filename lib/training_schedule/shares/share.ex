@@ -1,5 +1,5 @@
 # TrainingSchedule.ex
-# Copyright (c) 2023, Mathijs Saey
+# Copyright (c) 2023-2026, Mathijs Saey
 
 # TrainingSchedule.ex is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ defmodule TrainingSchedule.Shares.Share do
   def changeset(share, attrs) do
     share
     |> cast(attrs, [:name, :from, :to, :user_id])
-    |> validate_required([:name, :from, :to, :user_id])
+    |> validate_required([:name, :user_id])
     |> validate_length(:name, min: 3, max: 255)
     |> validate_dates()
     |> assoc_constraint(:user)
@@ -43,13 +43,20 @@ defmodule TrainingSchedule.Shares.Share do
       from = fetch_field!(changeset, :from)
       to = fetch_field!(changeset, :to)
 
-      if Date.compare(to, from) == :gt do
-        changeset
-      else
-        add_error(changeset, :to, "must be after \"from\" date")
+      cond do
+        is_nil(from) and is_nil(to) ->
+          changeset
+        is_nil(from) and (not is_nil(to)) ->
+          add_error(changeset, :from, "can only be nil if \"to\" is nil as well")
+        is_nil(to) and (not is_nil(from)) ->
+          add_error(changeset, :to, "can only be nil if \"from\" is nil as well")
+        Date.compare(to, from) != :gt ->
+          add_error(changeset, :to, "must be after \"from\" date")
+        true ->
+          changeset
       end
     else
-      changeset
+        changeset
     end
   end
 end

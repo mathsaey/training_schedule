@@ -1,5 +1,5 @@
 # TrainingSchedule.ex
-# Copyright (c) 2023, Mathijs Saey
+# Copyright (c) 2023-2026, Mathijs Saey
 
 # TrainingSchedule.ex is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +19,6 @@ defmodule TrainingScheduleWeb.ShareLive.Show do
 
   alias TrainingSchedule.Shares
   alias TrainingSchedule.Shares.Share
-  alias TrainingSchedule.Workouts
   alias TrainingSchedule.Cycles
 
   @impl true
@@ -57,9 +56,14 @@ defmodule TrainingScheduleWeb.ShareLive.Show do
      |> redirect(to: ~p"/")}
   end
 
-  defp load_workouts(socket, %Share{user_id: user_id, from: from, to: to}) do
-    Workouts.user_workouts(user_id, from, to)
-    |> Cycles.group_workouts(Date.beginning_of_week(from), Date.end_of_week(to), 7)
+  defp load_workouts(socket, share = %Share{from: from, to: to}) when is_nil(from) or is_nil(to) do
+    load_workouts(socket, Shares.bind(share))
+  end
+
+  defp load_workouts(socket, share) do
+    share
+    |> Shares.workouts()
+    |> Cycles.group_workouts(Date.beginning_of_week(share.from), Date.end_of_week(share.to), 7)
     |> then(&assign(socket, :cycles, &1))
   end
 end

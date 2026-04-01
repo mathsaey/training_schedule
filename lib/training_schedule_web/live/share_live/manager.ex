@@ -22,8 +22,8 @@ defmodule TrainingScheduleWeb.ShareLive.Manager do
   def mount(_params, _session, socket) do
     {:ok,
      socket
+     |> load_shares()
      |> assign(:edit, nil)
-     |> assign(:shares, load_shares(socket))
      |> assign(:changeset, Shares.changeset())}
   end
 
@@ -74,5 +74,14 @@ defmodule TrainingScheduleWeb.ShareLive.Manager do
     end
   end
 
-  defp load_shares(socket), do: Shares.user_shares(socket.assigns.user)
+  defp load_shares(socket) do
+    {infinite, timed} =
+      socket.assigns.user
+      |> Shares.user_shares()
+      |> Enum.split_with(&is_nil(&1.from))
+
+    socket
+    |> assign(:timed_shares, timed)
+    |> assign(:infinite_shares, infinite)
+  end
 end

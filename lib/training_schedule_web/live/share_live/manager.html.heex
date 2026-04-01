@@ -22,7 +22,71 @@
   </div>
 </.form>
 
-<.header>Existing Shares</.header>
+<.header>Unlimited Shares</.header>
+
+<table class="w-full table-auto mb-8">
+  <thead>
+    <tr class="border bg-gray-300 text-left dark:border-slate-600 dark:bg-gray-800">
+      <th class="p-2">Name</th>
+      <th class="p-2">Links</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr
+      :for={share <- @infinite_shares}
+      :if={share.id != @changeset.data.id}
+      class="border even:bg-gray-200 dark:border-slate-600 dark:even:bg-gray-600"
+    >
+      <td class="px-2 py-4"><%= share.name %></td>
+      <td class="flex items-center justify-start px-2 py-4">
+        <div class="flex flex-row pr-4">
+          <.link
+            id={"web_#{share.id}"}
+            navigate={~p"/share/#{share}"}
+            class="font-mono pr-4 text-blue-900 hover:underline dark:text-blue-400"
+          >
+            Schedule
+          </.link>
+          <div title="Copy to clipboard">
+            <Heroicons.clipboard
+              outline
+              class="transition-color h-5 duration-100 active:stroke-blue-500"
+              phx-click={JS.dispatch("phx:copy", to: "#web_#{share.id}")}
+            />
+          </div>
+        </div>
+        <div class="flex flex-row px-4">
+          <.link
+            id={"ics_#{share.id}"}
+            navigate={~p"/export/share/ics/#{share}"}
+            class="font-mono pr-4 text-blue-900 hover:underline dark:text-blue-400"
+          >
+            Calendar (ics)
+          </.link>
+          <div title="Copy to clipboard">
+            <Heroicons.clipboard
+              outline
+              class="transition-color h-5 duration-100 active:stroke-blue-500"
+              phx-click={JS.dispatch("phx:copy", to: "#ics_#{share.id}")}
+            />
+          </div>
+        </div>
+      </td>
+      <td class="px-2 py-4 text-center">
+        <button phx-click="edit" phx-value-share-id={share.id} class="px-4 text-blue-500">
+          Edit
+        </button>
+        <button phx-click="delete" phx-value-share-id={share.id} class="px-4 text-red-500">
+          Delete
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<.header>Timed Shares</.header>
 
 <table class="w-full table-auto">
   <thead>
@@ -37,7 +101,7 @@
   </thead>
   <tbody>
     <tr
-      :for={share <- @shares}
+      :for={share <- @timed_shares}
       :if={share.id != @changeset.data.id}
       class="border even:bg-gray-200 dark:border-slate-600 dark:even:bg-gray-600"
     >

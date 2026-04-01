@@ -1,0 +1,42 @@
+# TrainingSchedule.ex
+# Copyright (c) 2023-2026, Mathijs Saey
+
+# TrainingSchedule.ex is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# TrainingSchedule.ex is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+defmodule TrainingSchedule.Repo.Migrations.MakeShareTimeNullable do
+  use Ecto.Migration
+
+  # SQLite does not support altering tables, so we create a new table and fill it with the
+  # contents of the previous table.
+  def up do
+    rename table("shares"), to: table("shares_old")
+
+    create table("shares", primary_key: false) do
+      add :id, :uuid, primary_key: true
+      add :name, :string, null: false, default: ""
+      add :from, :date, null: true
+      add :to, :date, null: true
+      add :user_id, references("users", on_delete: :delete_all)
+      timestamps()
+    end
+
+    execute """
+    INSERT INTO shares (id, name, "from", "to", user_id, inserted_at, updated_at)
+    SELECT id, name, "from", "to", user_id, inserted_at, updated_at
+    FROM shares_old
+    """
+
+    drop table("shares_old")
+  end
+end

@@ -26,8 +26,8 @@ defmodule TrainingScheduleWeb.ShareExportController do
       nil ->
         send_resp(conn, 404, "Share does not exist")
 
-      share = %Share{user_id: user_id, from: from, to: to} ->
-        ics = Workouts.user_workouts(user_id, from, to) |> to_ics(share)
+      share ->
+        ics = share |> Shares.workouts() |> to_ics(share.name)
 
         send_download(
           conn,
@@ -39,7 +39,7 @@ defmodule TrainingScheduleWeb.ShareExportController do
     end
   end
 
-  defp to_ics(workouts, share) do
+  defp to_ics(workouts, name) do
     now = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601(:basic)
 
     [
@@ -47,7 +47,7 @@ defmodule TrainingScheduleWeb.ShareExportController do
       "VERSION:2.0\r\n",
       "CALSCALE:GREGORIAN\r\n",
       "PRODID:-//mathsaey//training_schedule ics export//EN\r\n",
-      ["X-WR-CALNAME:", share.name, "\r\n"],
+      ["X-WR-CALNAME:", name, "\r\n"],
       workouts
       |> Enum.map(fn workout ->
         [

@@ -20,6 +20,10 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :training_schedule, TrainingSchedule.Shares,
+  bound_before: Duration.new!(year: 1),
+  bound_after: Duration.new!(year: 1)
+
 config :training_schedule, ecto_repos: [TrainingSchedule.Repo]
 config :training_schedule, TrainingSchedule.Repo, pool_size: 5
 
