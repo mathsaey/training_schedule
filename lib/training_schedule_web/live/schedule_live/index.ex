@@ -1,5 +1,5 @@
 # TrainingSchedule.ex
-# Copyright (c) 2023, Mathijs Saey
+# Copyright (c) 2023-2026, Mathijs Saey
 
 # TrainingSchedule.ex is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -100,7 +100,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
       end
 
     {from, to} = date_range(now)
-    push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
+    push_patch(socket, to: ~p"/schedule?from=#{from}&to=#{to}", replace: true)
   end
 
   defp date_range(now) do
@@ -112,18 +112,23 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
   defp redirect_to_default_url(socket) do
     from = Date.utc_today() |> Date.beginning_of_week()
     to = Date.add(from, @schedule_days)
-    push_patch(socket, to: ~p"/from/#{from}/to/#{to}", replace: true)
+    push_patch(socket, to: ~p"/schedule?from=#{from}&to=#{to}", replace: true)
   end
 
   defp action(socket, :index, %{"from" => from, "to" => to}) do
     maybe_load_between(socket, from, to)
   end
 
-  defp action(socket, action, params) when action in [:new, :edit] do
+  defp action(socket, :new, params) do
     socket
     |> maybe_load_between(params["from"], params["to"])
-    |> assign(:form_id, params["id"] || :new)
     |> assign(:date, params["date"])
+  end
+
+  defp action(socket, :edit, params) do
+    socket
+    |> maybe_load_between(params["from"], params["to"])
+    |> assign(:form_id, params["id"])
   end
 
   defp action(socket, _, _), do: redirect_to_default_url(socket)

@@ -29,6 +29,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
      |> assign(:workout, workout)
      |> assign(:type_options, type_options)
      |> assign(:changeset, Workouts.changeset(workout))
+     |> assign_new(:date, fn -> workout.date end)
      |> assign(Map.take(assigns, [:from, :to, :date, :action, :user]))}
   end
 
@@ -70,7 +71,7 @@ defmodule TrainingScheduleWeb.ScheduleLive.FormComponent do
   def after_update(socket) do
     {:noreply,
      push_patch(socket,
-       to: ~p"/from/#{socket.assigns.from}/to/#{socket.assigns.to}",
+       to: ~p"/schedule?from=#{socket.assigns.from}&to=#{socket.assigns.to}",
        replace: true
      )}
   end

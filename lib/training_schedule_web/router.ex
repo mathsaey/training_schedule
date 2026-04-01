@@ -45,9 +45,9 @@ defmodule TrainingScheduleWeb.Router do
       pipe_through [:browser, :ensure_authenticated]
 
       live "/", ScheduleLive.Index, :index
-      live "/from/:from/to/:to", ScheduleLive.Index, :index
-      live "/from/:from/to/:to/new/:date", ScheduleLive.Index, :new
-      live "/from/:from/to/:to/edit/:date/:id", ScheduleLive.Index, :edit
+      live "/schedule", ScheduleLive.Index, :index
+      live "/schedule/new/:date", ScheduleLive.Index, :new
+      live "/schedule/edit/:id", ScheduleLive.Index, :edit
 
       live "/types", WorkoutTypeLive.Index, :index
       live "/types/new", WorkoutTypeLive.Index, :new

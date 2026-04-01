@@ -1,5 +1,5 @@
 <div>
-  <.workout_form_modal id="schedule_workout_popup" return={~p"/from/#{@from}/to/#{@to}"}>
+  <.workout_form_modal id="schedule_workout_popup" return={~p"/schedule?from=#{@from}&to=#{@to}"}>
     <:preview>
       <div class="flex flex-col items-center">
         <WorkoutComponents.card

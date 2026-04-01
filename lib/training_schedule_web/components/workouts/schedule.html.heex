@@ -44,7 +44,7 @@
     >
       <div class="flex w-full justify-between p-2">
         <%= if @modify? do %>
-          <.link patch={~p"/from/#{@from}/to/#{@to}/new/#{date}"} replace>
+          <.link patch={~p"/schedule/new/#{date}?from=#{@from}&to=#{@to}"} replace>
             <Heroicons.plus_circle
               mini
               class="h-5 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
@@ -74,7 +74,7 @@
         replace
         draggable={if @modify?, do: true}
         data-template={if @modify?, do: workout |> Workouts.to_copy_template() |> Jason.encode!()}
-        action={if @modify?, do: ~p"/from/#{@from}/to/#{@to}/edit/#{workout.date}/#{workout.id}"}
+        action={if @modify?, do: ~p"/schedule/edit/#{workout.id}?from=#{@from}&to=#{@to}"}
       >
         <%= workout.description %>
       </.card>

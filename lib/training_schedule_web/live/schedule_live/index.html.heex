@@ -1,12 +1,12 @@
 <div class="flex w-full justify-center">
   <div class="flex">
-    <.nav_link patch={~p"/from/#{@back}/to/#{@to}"}>
+    <.nav_link patch={~p"/schedule?from=#{@back}&to=#{@to}"}>
       <Heroicons.chevron_up outline class="h-5" />
     </.nav_link>
-    <.nav_link patch={~p"/"}>
+    <.nav_link patch={~p"/schedule"}>
       Reset
     </.nav_link>
-    <.nav_link patch={~p"/from/#{@from}/to/#{@forward}"}>
+    <.nav_link patch={~p"/schedule?from=#{@from}&to=#{@forward}"}>
       <Heroicons.chevron_down outline class="h-5" />
     </.nav_link>
   </div>
@@ -16,13 +16,22 @@
 
 <%= case @live_action do %>
   <% :index -> %>
-  <% form when form in [:new, :edit] -> %>
+  <% :new -> %>
+    <.live_component
+      id={:new}
+      action={@live_action}
+      module={FormComponent}
+      user={@user}
+      from={@from}
+      to={@to}
+      date={@date}
+    />
+  <% :edit -> %>
     <.live_component
       id={@form_id}
       action={@live_action}
       module={FormComponent}
       user={@user}
-      date={@date}
       from={@from}
       to={@to}
     />
