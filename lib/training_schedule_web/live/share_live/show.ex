@@ -56,7 +56,8 @@ defmodule TrainingScheduleWeb.ShareLive.Show do
      |> redirect(to: ~p"/")}
   end
 
-  defp load_workouts(socket, share = %Share{from: from, to: to}) when is_nil(from) or is_nil(to) do
+  defp load_workouts(socket, share = %Share{from: from, to: to})
+       when is_nil(from) or is_nil(to) do
     load_workouts(socket, Shares.bind(share))
   end
 

@@ -17,8 +17,7 @@
 defmodule TrainingScheduleWeb.ShareExportController do
   use TrainingScheduleWeb, :controller
 
-  alias TrainingSchedule.{Shares, Workouts}
-  alias TrainingSchedule.Shares.Share
+  alias TrainingSchedule.Shares
   alias TrainingScheduleWeb.Endpoint
 
   def ics(conn, %{"id" => id}) do

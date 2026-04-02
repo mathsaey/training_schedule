@@ -46,17 +46,21 @@ defmodule TrainingSchedule.Shares.Share do
       cond do
         is_nil(from) and is_nil(to) ->
           changeset
-        is_nil(from) and (not is_nil(to)) ->
+
+        is_nil(from) and not is_nil(to) ->
           add_error(changeset, :from, "can only be nil if \"to\" is nil as well")
-        is_nil(to) and (not is_nil(from)) ->
+
+        is_nil(to) and not is_nil(from) ->
           add_error(changeset, :to, "can only be nil if \"from\" is nil as well")
+
         Date.compare(to, from) != :gt ->
           add_error(changeset, :to, "must be after \"from\" date")
+
         true ->
           changeset
       end
     else
-        changeset
+      changeset
     end
   end
 end
