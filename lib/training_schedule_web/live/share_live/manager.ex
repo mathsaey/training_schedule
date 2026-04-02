@@ -29,8 +29,8 @@ defmodule TrainingScheduleWeb.ShareLive.Manager do
 
   @impl true
   def handle_event("delete", %{"share-id" => id}, socket) do
-    Shares.safe_delete(id, socket.assigns.user.id)
-    {:noreply, assign(socket, :shares, load_shares(socket))}
+    Shares.delete(id, socket.assigns.user.id)
+    {:noreply, load_shares(socket)}
   end
 
   @impl true
@@ -52,7 +52,7 @@ defmodule TrainingScheduleWeb.ShareLive.Manager do
       {:ok, _} ->
         {:noreply,
          socket
-         |> assign(:shares, load_shares(socket))
+         |> load_shares()
          |> assign(:edit, nil)
          |> assign(:changeset, Shares.changeset())}
 
