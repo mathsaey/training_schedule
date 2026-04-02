@@ -30,9 +30,7 @@ defmodule TrainingSchedule.Shares do
 
   def changeset(share \\ %Share{}, attrs \\ %{}), do: Share.changeset(share, attrs)
 
-  def delete(uuid), do: uuid |> get() |> Repo.delete() |> maybe_broadcast(:delete)
-
-  def safe_delete(uuid, user_id) do
+  def delete(uuid, user_id) do
     share = get(uuid)
 
     if user_id == share.user_id do
@@ -40,11 +38,13 @@ defmodule TrainingSchedule.Shares do
     end
   end
 
-  def update(share, attrs) do
-    share
-    |> Share.changeset(attrs)
-    |> Repo.update()
-    |> maybe_broadcast(:update)
+  def update(share, user_id, attrs) do
+    if user_id == share.user_id do
+      share
+      |> Share.changeset(attrs)
+      |> Repo.update()
+      |> maybe_broadcast(:update)
+    end
   end
 
   def get(uuid) do

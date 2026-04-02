@@ -48,7 +48,7 @@ defmodule TrainingScheduleWeb.ShareLive.Manager do
   end
 
   def handle_event("update", %{"share" => params}, socket) do
-    case Shares.update(socket.assigns.edit, params) do
+    case Shares.update(socket.assigns.edit, socket.assigns.user.id, params) do
       {:ok, _} ->
         {:noreply,
          socket
