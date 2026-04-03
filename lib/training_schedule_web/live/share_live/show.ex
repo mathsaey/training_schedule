@@ -56,14 +56,19 @@ defmodule TrainingScheduleWeb.ShareLive.Show do
      |> redirect(to: ~p"/")}
   end
 
-  defp load_workouts(socket, share = %Share{from: from, to: to})
-       when is_nil(from) or is_nil(to) do
-    load_workouts(socket, Shares.bind(share))
+  # Temporary workaround. Should be handled through the url of the share later
+  # Generalize schedule live view into a (live) component first
+  defp load_workouts(socket, share = %Share{from: nil, to: nil}) do
+    now = Date.utc_today()
+    from = Date.shift(now, Duration.new!(week: -1))
+    to = Date.shift(now, Duration.new!(week: 10))
+
+    load_workouts(socket, %{share | from: from, to: to})
   end
 
   defp load_workouts(socket, share) do
     share
-    |> Shares.workouts()
+    |> Shares.workouts(nil, nil)
     |> Cycles.group_workouts(Date.beginning_of_week(share.from), Date.end_of_week(share.to), 7)
     |> then(&assign(socket, :cycles, &1))
   end

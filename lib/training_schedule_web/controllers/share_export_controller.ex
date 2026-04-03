@@ -20,13 +20,17 @@ defmodule TrainingScheduleWeb.ShareExportController do
   alias TrainingSchedule.Shares
   alias TrainingScheduleWeb.Endpoint
 
+  @before_today Duration.new!(year: 1) |> Duration.negate()
+  @after_today Duration.new!(year: 1)
+
   def ics(conn, %{"id" => id}) do
     case Shares.get(id) do
       nil ->
         send_resp(conn, 404, "Share does not exist")
 
       share ->
-        ics = share |> Shares.workouts() |> to_ics(share.name)
+        {from, to} = date_range()
+        ics = share |> Shares.workouts(from, to) |> to_ics(share.name)
 
         send_download(
           conn,
@@ -36,6 +40,11 @@ defmodule TrainingScheduleWeb.ShareExportController do
           content_type: "text/calendar"
         )
     end
+  end
+
+  defp date_range do
+    now = Date.utc_today()
+    {Date.shift(now, @before_today), Date.shift(now, @after_today)}
   end
 
   defp to_ics(workouts, name) do

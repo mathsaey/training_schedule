@@ -18,10 +18,6 @@ defmodule TrainingSchedule.Shares do
   import Ecto.Query
   alias TrainingSchedule.{PubSub, Repo, Workouts, Shares.Share, Accounts.User}
 
-  bounds = Application.compile_env!(:training_schedule, __MODULE__)
-  @bound_before bounds[:bound_before]
-  @bound_after bounds[:bound_after]
-
   def create(user_id, attrs) do
     %Share{user_id: user_id}
     |> Share.changeset(attrs)
@@ -60,18 +56,11 @@ defmodule TrainingSchedule.Shares do
     Repo.all(from s in Share, where: s.user_id == ^id, order_by: [desc: s.to, desc: s.from])
   end
 
-  def bind(share = %Share{}) do
-    now = Date.utc_today()
-    from = Date.shift(now, Duration.negate(@bound_before))
-    to = Date.shift(now, @bound_after)
-    %Share{share | from: from, to: to}
+  def workouts(%Share{user_id: user_id, from: nil, to: nil}, from, to) do
+    Workouts.user_workouts(user_id, from, to)
   end
 
-  def workouts(share = %Share{from: from, to: to}) when from == nil or to == nil do
-    share |> bind() |> workouts()
-  end
-
-  def workouts(%Share{user_id: user_id, from: from, to: to}) do
+  def workouts(%Share{user_id: user_id, from: from, to: to}, _, _) do
     Workouts.user_workouts(user_id, from, to)
   end
 
