@@ -37,7 +37,7 @@ config :phoenix, :json_library, Jason
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 config :esbuild,
-  version: "0.18.6",
+  version: "0.28.0",
   default: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),

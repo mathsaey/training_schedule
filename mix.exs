@@ -44,34 +44,34 @@ defmodule TrainingSchedule.MixProject do
       # Password hashing
       {:argon2_elixir, "~> 4.1"},
       # Parsing
-      {:nimble_parsec, "~> 1.3"},
+      {:nimble_parsec, "~> 1.4"},
       # Time zone database
       {:tz, "~> 0.28"},
 
       # Webserver / framework
       {:jason, "~> 1.4"},
       {:phoenix, "~> 1.7", override: true},
-      {:bandit, "~> 1.6"},
+      {:bandit, "~> 1.10"},
       {:phoenix_html, "~> 4.1"},
-      {:phoenix_ecto, "~> 4.6"},
+      {:phoenix_ecto, "~> 4.7"},
       {:phoenix_live_view, "~> 0.20"},
 
       # Frontend
       {:heroicons, "~> 0.5"},
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.4", runtime: Mix.env() == :dev},
 
       # Database
-      {:ecto_sql, "~> 3.12"},
-      {:ecto_sqlite3, "~> 0.19"},
+      {:ecto_sql, "~> 3.13"},
+      {:ecto_sqlite3, "~> 0.22"},
 
       # Dev / testing tools
-      {:tailwind_formatter, "~> 0.3", only: :dev, runtime: false},
-      {:phoenix_live_reload, "~> 1.5", only: :dev},
+      {:tailwind_formatter, "~> 0.4", only: :dev, runtime: false},
+      {:phoenix_live_reload, "~> 1.6", only: :dev},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
-      {:sobelow, "~> 0.13", only: :dev, runtime: false},
+      {:sobelow, "~> 0.14", only: :dev, runtime: false},
       {:credo, "~> 1.7", only: :dev, runtime: false},
-      {:floki, "~> 0.36", only: :test}
+      {:floki, "~> 0.38", only: :test}
     ]
   end
 
