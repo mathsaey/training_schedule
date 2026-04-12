@@ -2,8 +2,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-  ELIXIR_VERSION: 1.19.3
-  OTP_VERSION: 28.1.1
+  ELIXIR_VERSION: 1.19.5
+  OTP_VERSION: 28.4.2
 permissions:
   contents: read
 concurrency:

@@ -1,5 +1,5 @@
 # TrainingSchedule.ex
-# Copyright (c) 2023, Mathijs Saey
+# Copyright (c) 2023-2026, Mathijs Saey
 
 # TrainingSchedule.ex is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -19,9 +19,9 @@
 # - After the build phase, Elixir and its dependencies are no longer required.
 #   the run phase uses a stripped down container which executes the release.
 
-ARG ELIXIR_VERSION=1.19.3
-ARG OTP_VERSION=28.1.1
-ARG DEBIAN_VERSION=trixie-20251103-slim
+ARG ELIXIR_VERSION=1.19.5
+ARG OTP_VERSION=28.4.2
+ARG DEBIAN_VERSION=trixie-20260406-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
