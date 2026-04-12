@@ -164,11 +164,14 @@ defmodule TrainingScheduleWeb.ScheduleLive.Index do
 
   defp nav_link(assigns) do
     ~H"""
-    <.link class={~w(
-        mx-2 mt-5 mb-4 inline-block rounded-full
-        bg-gray-300 px-4 py-2
-        text-gray-500 hover:ring-2 dark:bg-gray-500 dark:text-gray-100
-      )} patch={@patch} replace {@rest}>
+    <.link
+      class={
+        ~w(mx-2 mt-5 mb-4 inline-block rounded-full bg-gray-300 px-4 py-2 text-gray-500 hover:ring-2 dark:bg-gray-500 dark:text-gray-100)
+      }
+      patch={@patch}
+      replace
+      {@rest}
+    >
       <%= render_slot(@inner_block) %>
     </.link>
     """
