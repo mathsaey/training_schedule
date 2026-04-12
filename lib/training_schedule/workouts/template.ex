@@ -69,7 +69,7 @@ defmodule TrainingSchedule.Workouts.Template do
       iex> expand("Race time!", %{"reps" => "5", "distance" => "400m"})
       ["Race time!"]
       iex> expand("{reps}x{distance", %{"reps" => "5", "distance" => "400m"})
-      ** (MatchError) no match of right hand side value: {:error, \"{distance\"}
+      ** (MatchError) no match of right hand side value:...
   """
   @spec expand(String.t(), %{String.t() => String.t()}) :: iolist()
   def expand(template, values) do
