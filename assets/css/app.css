@@ -1,5 +1,5 @@
 /* TrainingSchedule.ex
- * Copyright (c) 2023, Mathijs Saey
+ * Copyright (c) 2023-2026, Mathijs Saey
  *
  * TrainingSchedule.ex is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,9 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss';
 
 @font-face {
   font-family: 'Open Sans';
@@ -103,3 +101,17 @@
   font-weight: 800;
   src: local(''), url('../fonts/open-sans-v34-latin-800italic.woff2') format('woff2');
 }
+
+@theme {
+  --font-sans: "Open Sans", ui-sans-serif, system-ui;
+  --font-serif: ui-serif;
+  --font-mono: Menlo, ui-monospace;
+
+  --grid-template-columns-schedule: 90px repeat(7, minmax(0, 1fr));
+}
+
+@plugin "@tailwindcss/forms";
+@variant phx-no-feedback (.phx-no-feedback&, .phx-no-feedback &);
+@variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
+@variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
+@variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);

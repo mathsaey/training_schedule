@@ -68,7 +68,7 @@ defmodule TrainingScheduleWeb.Components.WorkoutComponents do
   end
 
   defp card_shared do
-    "space-y-1p flex w-64 lg:w-32 xl:w-40 flex-col rounded p-4 m-2 text-center"
+    "space-y-1p flex w-64 lg:w-32 xl:w-40 flex-col rounded-sm p-4 m-2 text-center"
   end
 
   defp card_title(%{cancelled?: true}), do: "break-words font-bold line-through decoration-2"

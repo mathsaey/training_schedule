@@ -204,7 +204,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
         name={@name}
         value="true"
         checked={@checked}
-        class={["rounded", "text-sky-500", @class]}
+        class={["rounded-sm", "text-sky-500", @class]}
         {@rest}
       />
     </div>
@@ -221,7 +221,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
           name={@name}
           class={[
             input_border(@errors),
-            "w-full rounded",
+            "w-full rounded-sm",
             "text-zinc-900 focus:outline-none focus:ring-4 sm:text-sm sm:leading-6",
             "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:ring-zinc-800/5 phx-no-feedback:focus:border-zinc-400",
             @class
@@ -276,7 +276,7 @@ defmodule TrainingScheduleWeb.CoreComponents do
         value={@value}
         class={[
           input_border(@errors),
-          "rounded",
+          "rounded-sm",
           "text-zinc-900 focus:outline-none focus:ring-4 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:ring-zinc-800/5 phx-no-feedback:focus:border-zinc-400",
           @class

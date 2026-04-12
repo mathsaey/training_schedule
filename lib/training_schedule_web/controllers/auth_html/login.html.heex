@@ -4,7 +4,7 @@
     for={@conn.params["session"]}
     as={:login}
     action={~p"/login?#{@conn.query_params}"}
-    class="mx-8 my-8 flex w-5/6 flex-col items-center rounded bg-slate-200 pb-6 shadow-md dark:bg-slate-600 sm:w-96"
+    class="mx-8 my-8 flex w-5/6 flex-col items-center rounded-sm bg-slate-200 pb-6 shadow-md dark:bg-slate-600 sm:w-96"
   >
     <div class="mt-4 flex w-2/3 flex-col">
       <.input field={{f, :navigate}} type="hidden" value={@navigate} />

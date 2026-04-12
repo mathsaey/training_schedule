@@ -1,5 +1,5 @@
 # TrainingSchedule.ex
-# Copyright (c) 2023, Mathijs Saey
+# Copyright (c) 2023-2026, Mathijs Saey
 
 # TrainingSchedule.ex is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -46,14 +46,13 @@ config :esbuild,
   ]
 
 config :tailwind,
-  version: "3.3.2",
+  version: "4.2.2",
   default: [
     args: ~w(
-      --config=tailwind.config.js
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
+      --input=assets/css/app.css
+      --output=priv/static/assets/app.css
     ),
-    cd: Path.expand("../assets", __DIR__)
+    cd: Path.expand("..", __DIR__)
   ]
 
 import_config "#{config_env()}.exs"
