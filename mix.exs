@@ -24,8 +24,9 @@ defmodule TrainingSchedule.MixProject do
       elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      deps: deps(),
       aliases: aliases(),
-      deps: deps()
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -50,7 +51,7 @@ defmodule TrainingSchedule.MixProject do
 
       # Webserver / framework
       {:jason, "~> 1.4"},
-      {:phoenix, "~> 1.7", override: true},
+      {:phoenix, "~> 1.8", override: true},
       {:bandit, "~> 1.10"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_ecto, "~> 4.7"},
